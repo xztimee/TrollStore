@@ -22,10 +22,10 @@ ci_make_roothelper:
 	@$(MAKE) -C ./RootHelper DEBUG=0 all
 
 make_luisestore:
-	@$(MAKE) -C ./LuiseStore FINALPACKAGE=1 $(MAKECMDGOALS)
+	@$(MAKE) -C ./TrollStore FINALPACKAGE=1 $(MAKECMDGOALS)
 
 ci_make_luisestore:
-	@$(MAKE) -C ./LuiseStore FINALPACKAGE=1 all
+	@$(MAKE) -C ./TrollStore FINALPACKAGE=1 all
 
 ifneq ($(MAKECMDGOALS),clean)
 
@@ -70,16 +70,16 @@ ci_make_trollhelper_embedded:
 	@$(MAKE) clean -C ./TrollHelper
 
 assemble_luisestore:
-	@cp ./RootHelper/.theos/obj/luisestorehelper ./LuiseStore/.theos/obj/LuiseStore.app/luisestorehelper
-	@cp ./TrollHelper/.theos/obj/LuiseStorePersistenceHelper.app/LuiseStorePersistenceHelper ./LuiseStore/.theos/obj/LuiseStore.app/PersistenceHelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper ./TrollStore/.theos/obj/LuiseStore.app/luisestorehelper
+	@cp ./TrollHelper/.theos/obj/LuiseStorePersistenceHelper.app/LuiseStorePersistenceHelper ./TrollStore/.theos/obj/LuiseStore.app/PersistenceHelper
 	@export COPYFILE_DISABLE=1
-	@tar -czvf ./_build/LuiseStore.tar -C ./LuiseStore/.theos/obj LuiseStore.app
+	@tar -czvf ./_build/LuiseStore.tar -C ./TrollStore/.theos/obj LuiseStore.app
 
 ci_assemble_luisestore:
-	@cp ./RootHelper/.theos/obj/luisestorehelper ./LuiseStore/.theos/obj/LuiseStore.app/luisestorehelper
-	@cp ./TrollHelper/.theos/obj/LuiseStorePersistenceHelper.app/LuiseStorePersistenceHelper ./LuiseStore/.theos/obj/LuiseStore.app/PersistenceHelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper ./TrollStore/.theos/obj/LuiseStore.app/luisestorehelper
+	@cp ./TrollHelper/.theos/obj/LuiseStorePersistenceHelper.app/LuiseStorePersistenceHelper ./TrollStore/.theos/obj/LuiseStore.app/PersistenceHelper
 	@export COPYFILE_DISABLE=1
-	@tar -czvf ./_build/LuiseStore.tar -C ./LuiseStore/.theos/obj LuiseStore.app
+	@tar -czvf ./_build/LuiseStore.tar -C ./TrollStore/.theos/obj LuiseStore.app
 
 build_installer15:
 	@mkdir -p ./_build/tmp15
@@ -113,31 +113,31 @@ build_installer64e:
 
 make_luisestore_lite:
 	@$(MAKE) -C ./RootHelper DEBUG=0 TROLLSTORE_LITE=1
-	@rm -rf ./LuiseStoreLite/Resources/luisestorehelper
-	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./LuiseStoreLite/Resources/luisestorehelper
-	@$(MAKE) -C ./LuiseStoreLite package FINALPACKAGE=1
+	@rm -rf ./TrollStoreLite/Resources/luisestorehelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./TrollStoreLite/Resources/luisestorehelper
+	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1
 	@$(MAKE) -C ./RootHelper TROLLSTORE_LITE=1 clean
-	@$(MAKE) -C ./LuiseStoreLite clean
+	@$(MAKE) -C ./TrollStoreLite clean
 	@$(MAKE) -C ./RootHelper DEBUG=0 TROLLSTORE_LITE=1 THEOS_PACKAGE_SCHEME=rootless
-	@rm -rf ./LuiseStoreLite/Resources/luisestorehelper
-	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./LuiseStoreLite/Resources/luisestorehelper
-	@$(MAKE) -C ./LuiseStoreLite package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+	@rm -rf ./TrollStoreLite/Resources/luisestorehelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./TrollStoreLite/Resources/luisestorehelper
+	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 
 ci_make_luisestore_lite:
 	@$(MAKE) -C ./RootHelper DEBUG=0 TROLLSTORE_LITE=1 all
-	@rm -rf ./LuiseStoreLite/Resources/luisestorehelper
-	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./LuiseStoreLite/Resources/luisestorehelper
-	@$(MAKE) -C ./LuiseStoreLite package FINALPACKAGE=1 all
+	@rm -rf ./TrollStoreLite/Resources/luisestorehelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./TrollStoreLite/Resources/luisestorehelper
+	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1 all
 	@$(MAKE) -C ./RootHelper TROLLSTORE_LITE=1 clean
-	@$(MAKE) -C ./LuiseStoreLite clean
+	@$(MAKE) -C ./TrollStoreLite clean
 	@$(MAKE) -C ./RootHelper DEBUG=0 TROLLSTORE_LITE=1 THEOS_PACKAGE_SCHEME=rootless all
-	@rm -rf ./LuiseStoreLite/Resources/luisestorehelper
-	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./LuiseStoreLite/Resources/luisestorehelper
-	@$(MAKE) -C ./LuiseStoreLite package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless all
+	@rm -rf ./TrollStoreLite/Resources/luisestorehelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./TrollStoreLite/Resources/luisestorehelper
+	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless all
 
 else
 make_luisestore_lite:
-	@$(MAKE) -C ./LuiseStoreLite $(MAKECMDGOALS)
+	@$(MAKE) -C ./TrollStoreLite $(MAKECMDGOALS)
 endif
 
 .PHONY: $(TOPTARGETS) ci-build pre_build assemble_luisestore make_trollhelper_package make_trollhelper_embedded build_installer15 build_installer64e
