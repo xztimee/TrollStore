@@ -226,7 +226,7 @@ jobs:
             Note: Installer IPAs are not included in automated builds as they require a victim IPA.
             
             ### Installation
-            Please refer to the [LuiseStore documentation](https://github.com/luisepog/LuiseStore) for installation instructions.
+            Please refer to the [LuiseStore documentation](https://github.com/xztimee/LuiseStore) for installation instructions.
           draft: false
           prerelease: ${{ contains(env.VERSION, '-beta') || contains(env.VERSION, '-rc') || contains(env.VERSION, '-alpha') }}
           files: |

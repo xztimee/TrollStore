@@ -27,7 +27,8 @@
 
 - (void)downloadLuiseStoreAndRun:(void (^)(NSString* localLuiseStoreTarPath))doHandler
 {
-	NSURL* luiseStoreURL = [NSURL URLWithString:@"https://github.com/luisepog/LuiseStore/releases/latest/download/LuiseStore.tar"];
+	// Download LuiseStore.tar from GitHub releases
+	NSURL* luiseStoreURL = [NSURL URLWithString:@"https://github.com/xztimee/LuiseStore/releases/latest/download/LuiseStore.tar"];
 	NSURLRequest* luiseStoreRequest = [NSURLRequest requestWithURL:luiseStoreURL];
 
 	NSURLSessionDownloadTask* downloadTask = [NSURLSession.sharedSession downloadTaskWithRequest:luiseStoreRequest completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error)

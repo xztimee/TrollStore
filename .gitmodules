@@ -1,3 +1,4 @@
 [submodule "ChOma"]
 	path = ChOma
 	url = https://github.com/opa334/ChOma
+	# Note: This is the original ChOma library, kept for compatibility

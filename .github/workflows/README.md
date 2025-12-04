@@ -598,7 +598,8 @@ git diff <old-commit> <new-commit> .github/workflows/build-release.yml
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [THEOS Documentation](https://theos.dev/)
-- [TrollStore Repository](https://github.com/opa334/TrollStore)
+- [LuiseStore Repository](https://github.com/xztimee/LuiseStore)
+- [Original TrollStore Repository](https://github.com/opa334/TrollStore)
 - [GitHub Actions Workflow Syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
 
 ---

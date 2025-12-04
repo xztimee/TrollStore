@@ -115,16 +115,12 @@ To compile LuiseStore, ensure [theos](https://theos.dev/docs/installation) is in
 
 ## Credits and Further Reading
 
-This is a fork of TrollStore by opa334. All credits for the original work go to:
+LuiseStore is a fork of [TrollStore](https://github.com/opa334/TrollStore) by opa334. 
 
-[@alfiecg_dev](https://twitter.com/alfiecg_dev/) - Found the CoreTrust bug that allows TrollStore to work through patchdiffing and worked on automating the bypass.
+For complete credits and acknowledgments, see [CREDITS.md](CREDITS.md).
 
-Google Threat Analysis Group - Found the CoreTrust bug as part of an in-the-wild spyware chain and reported it to Apple.
+### Key Resources
 
-[@LinusHenze](https://twitter.com/LinusHenze) - Found the installd bypass used to install TrollStore on iOS 14-15.6.1 via TrollHelperOTA, as well as the original CoreTrust bug used in TrollStore 1.0.
-
-[Fugu15 Presentation](https://youtu.be/rPTifU1lG7Q)
-
-[Write-Up on the first CoreTrust bug with more information](https://worthdoingbadly.com/coretrust/).
-
-Original TrollStore: [https://github.com/opa334/TrollStore](https://github.com/opa334/TrollStore)
+- [Original TrollStore Repository](https://github.com/opa334/TrollStore)
+- [Fugu15 Presentation](https://youtu.be/rPTifU1lG7Q)
+- [Write-Up on the first CoreTrust bug](https://worthdoingbadly.com/coretrust/)

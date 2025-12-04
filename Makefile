@@ -72,14 +72,12 @@ ci_make_trollhelper_embedded:
 assemble_luisestore:
 	@cp ./RootHelper/.theos/obj/luisestorehelper ./LuiseStore/.theos/obj/LuiseStore.app/luisestorehelper
 	@cp ./TrollHelper/.theos/obj/LuiseStorePersistenceHelper.app/LuiseStorePersistenceHelper ./LuiseStore/.theos/obj/LuiseStore.app/PersistenceHelper
-	@export COPYFILE_DISABLE=1
-	@tar -czvf ./_build/LuiseStore.tar -C ./LuiseStore/.theos/obj LuiseStore.app
+	@COPYFILE_DISABLE=1 tar -czf ./_build/LuiseStore.tar -C ./LuiseStore/.theos/obj LuiseStore.app
 
 ci_assemble_luisestore:
 	@cp ./RootHelper/.theos/obj/luisestorehelper ./LuiseStore/.theos/obj/LuiseStore.app/luisestorehelper
 	@cp ./TrollHelper/.theos/obj/LuiseStorePersistenceHelper.app/LuiseStorePersistenceHelper ./LuiseStore/.theos/obj/LuiseStore.app/PersistenceHelper
-	@export COPYFILE_DISABLE=1
-	@tar -czvf ./_build/LuiseStore.tar -C ./LuiseStore/.theos/obj LuiseStore.app
+	@COPYFILE_DISABLE=1 tar -czf ./_build/LuiseStore.tar -C ./LuiseStore/.theos/obj LuiseStore.app
 
 build_installer15:
 	@mkdir -p ./_build/tmp15
