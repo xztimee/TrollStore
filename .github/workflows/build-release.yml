@@ -149,7 +149,7 @@ jobs:
             echo "Version extracted from git tag: $VERSION"
           else
             # Fallback: Extract version from Info.plist
-            PLIST_PATH="TrollStore/Resources/Info.plist"
+            PLIST_PATH="LuiseStore/Resources/Info.plist"
             if [ -f "$PLIST_PATH" ]; then
               # Use PlistBuddy to read CFBundleVersion
               VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH" 2>/dev/null || echo "")
