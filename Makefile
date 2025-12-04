@@ -3,7 +3,7 @@ TOPTARGETS := all clean update
 $(TOPTARGETS): pre_build make_fastPathSign make_roothelper make_trollstore make_trollhelper_embedded make_trollhelper_package assemble_trollstore build_installer15 build_installer64e make_trollstore_lite
 
 # CI build target without installers (requires InstallerVictim.ipa)
-ci-build: pre_build make_fastPathSign make_roothelper make_trollstore make_trollhelper_embedded make_trollhelper_package assemble_trollstore make_trollstore_lite
+ci-build: pre_build ci_make_fastPathSign ci_make_roothelper ci_make_trollstore ci_make_trollhelper_embedded ci_make_trollhelper_package ci_assemble_trollstore ci_make_trollstore_lite
 
 pre_build:
 	@rm -rf ./_build 2>/dev/null || true
@@ -12,11 +12,20 @@ pre_build:
 make_fastPathSign:
 	@$(MAKE) -C ./Exploits/fastPathSign $(MAKECMDGOALS)
 
+ci_make_fastPathSign:
+	@$(MAKE) -C ./Exploits/fastPathSign all
+
 make_roothelper:
 	@$(MAKE) -C ./RootHelper DEBUG=0 $(MAKECMDGOALS)
 
+ci_make_roothelper:
+	@$(MAKE) -C ./RootHelper DEBUG=0 all
+
 make_trollstore:
 	@$(MAKE) -C ./TrollStore FINALPACKAGE=1 $(MAKECMDGOALS)
+
+ci_make_trollstore:
+	@$(MAKE) -C ./TrollStore FINALPACKAGE=1 all
 
 ifneq ($(MAKECMDGOALS),clean)
 
@@ -26,6 +35,14 @@ make_trollhelper_package:
 	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 package $(MAKECMDGOALS)
 	@$(MAKE) clean -C ./TrollHelper
 	@$(MAKE) -C ./TrollHelper THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 package $(MAKECMDGOALS)
+	@rm ./TrollHelper/Resources/trollstorehelper
+
+ci_make_trollhelper_package:
+	@$(MAKE) clean -C ./TrollHelper
+	@cp ./RootHelper/.theos/obj/trollstorehelper ./TrollHelper/Resources/trollstorehelper
+	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 package all
+	@$(MAKE) clean -C ./TrollHelper
+	@$(MAKE) -C ./TrollHelper THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 package all
 	@rm ./TrollHelper/Resources/trollstorehelper
 
 make_trollhelper_embedded:
@@ -40,7 +57,25 @@ make_trollhelper_embedded:
 	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64e
 	@$(MAKE) clean -C ./TrollHelper
 
+ci_make_trollhelper_embedded:
+	@$(MAKE) clean -C ./TrollHelper
+	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 all
+	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded
+	@$(MAKE) clean -C ./TrollHelper
+	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 LEGACY_CT_BUG=1 all
+	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64
+	@$(MAKE) clean -C ./TrollHelper
+	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 CUSTOM_ARCHS=arm64e all
+	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64e
+	@$(MAKE) clean -C ./TrollHelper
+
 assemble_trollstore:
+	@cp ./RootHelper/.theos/obj/trollstorehelper ./TrollStore/.theos/obj/TrollStore.app/trollstorehelper
+	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./TrollStore/.theos/obj/TrollStore.app/PersistenceHelper
+	@export COPYFILE_DISABLE=1
+	@tar -czvf ./_build/TrollStore.tar -C ./TrollStore/.theos/obj TrollStore.app
+
+ci_assemble_trollstore:
 	@cp ./RootHelper/.theos/obj/trollstorehelper ./TrollStore/.theos/obj/TrollStore.app/trollstorehelper
 	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./TrollStore/.theos/obj/TrollStore.app/PersistenceHelper
 	@export COPYFILE_DISABLE=1
@@ -87,6 +122,18 @@ make_trollstore_lite:
 	@rm -rf ./TrollStoreLite/Resources/trollstorehelper
 	@cp ./RootHelper/.theos/obj/trollstorehelper_lite ./TrollStoreLite/Resources/trollstorehelper
 	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+
+ci_make_trollstore_lite:
+	@$(MAKE) -C ./RootHelper DEBUG=0 TROLLSTORE_LITE=1 all
+	@rm -rf ./TrollStoreLite/Resources/trollstorehelper
+	@cp ./RootHelper/.theos/obj/trollstorehelper_lite ./TrollStoreLite/Resources/trollstorehelper
+	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1 all
+	@$(MAKE) -C ./RootHelper TROLLSTORE_LITE=1 clean
+	@$(MAKE) -C ./TrollStoreLite clean
+	@$(MAKE) -C ./RootHelper DEBUG=0 TROLLSTORE_LITE=1 THEOS_PACKAGE_SCHEME=rootless all
+	@rm -rf ./TrollStoreLite/Resources/trollstorehelper
+	@cp ./RootHelper/.theos/obj/trollstorehelper_lite ./TrollStoreLite/Resources/trollstorehelper
+	@$(MAKE) -C ./TrollStoreLite package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless all
 
 else
 make_trollstore_lite:
