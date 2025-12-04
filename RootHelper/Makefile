@@ -17,10 +17,9 @@ $(HELPER_NAME)_FILES = $(wildcard *.m) $(wildcard ../Shared/*.m) $(wildcard ../C
 ifndef TROLLSTORE_LITE
 $(HELPER_NAME)_FILES += ../Exploits/fastPathSign/src/coretrust_bug.c ../Exploits/fastPathSign/src/codesign.m
 $(HELPER_NAME)_CODESIGN_FLAGS = --entitlements entitlements.plist
-$(HELPER_NAME)_LDFLAGS = -L../ChOma/external/ios -lcrypto -L$(shell brew --prefix libarchive)/lib
+$(HELPER_NAME)_LDFLAGS = -L../ChOma/external/ios -lcrypto
 else
 $(HELPER_NAME)_CODESIGN_FLAGS = -Sentitlements.plist
-$(HELPER_NAME)_LDFLAGS = -L$(shell brew --prefix libarchive)/lib
 endif
  
 $(HELPER_NAME)_CFLAGS = -fobjc-arc -I../Shared $(shell pkg-config --cflags libcrypto) -I../ChOma/src -I../Exploits/fastPathSign/src -I$(shell brew --prefix libarchive)/include
