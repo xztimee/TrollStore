@@ -61,7 +61,13 @@ jobs:
           brew link --overwrite dpkg || true
           brew link --overwrite ldid-procursus || true
           brew link --overwrite make || true
-          brew link --overwrite libarchive || true
+          brew link --force --overwrite libarchive || true
+          
+          # Verify libarchive installation
+          echo "Checking libarchive installation..."
+          brew list libarchive
+          ls -la $(brew --prefix)/opt/libarchive/ || true
+          ls -la $(brew --prefix)/Cellar/libarchive/ || true
 
       - name: Cache THEOS framework
         id: cache-theos
