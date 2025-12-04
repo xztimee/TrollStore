@@ -56,6 +56,12 @@ jobs:
 
           # Install required packages via Homebrew
           brew install dpkg ldid-procursus make openssl@3 libarchive
+          
+          # Link packages that may not be linked by default
+          brew link --overwrite dpkg || true
+          brew link --overwrite ldid-procursus || true
+          brew link --overwrite make || true
+          brew link --overwrite libarchive || true
 
       - name: Cache THEOS framework
         id: cache-theos
