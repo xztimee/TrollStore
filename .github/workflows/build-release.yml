@@ -206,7 +206,6 @@ jobs:
           prerelease: ${{ contains(env.VERSION, '-beta') || contains(env.VERSION, '-rc') || contains(env.VERSION, '-alpha') }}
           files: |
             artifacts/*.tar
-            artifacts/*.ipa
             artifacts/*.deb
           fail_on_unmatched_files: true
         env:
