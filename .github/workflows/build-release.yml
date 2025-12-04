@@ -87,7 +87,7 @@ jobs:
       - name: Build TrollStore
         timeout-minutes: 45
         run: |
-          make all
+          make ci-build
 
       - name: Create artifacts staging directory
         run: |
@@ -196,8 +196,9 @@ jobs:
             ### Artifacts
             This release includes the following build artifacts:
             - TrollStore.tar - Main TrollStore package
-            - TrollHelper IPAs - iOS 15 and arm64e installers
             - TrollHelper and TrollStoreLite deb packages
+            
+            Note: Installer IPAs are not included in automated builds as they require a victim IPA.
             
             ### Installation
             Please refer to the [TrollStore documentation](https://github.com/opa334/TrollStore) for installation instructions.
