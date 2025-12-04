@@ -6,7 +6,7 @@
 #import <dlfcn.h>
 #import <spawn.h>
 #import <objc/runtime.h>
-#import <TSUtil.h>
+#import <LSUtil.h>
 #import <sys/utsname.h>
 #import <mach-o/loader.h>
 #import <mach-o/fat.h>
@@ -125,7 +125,7 @@ NSString* appMainExecutablePathForAppPath(NSString* appPath)
 NSString* appPathForAppId(NSString* appId)
 {
 	if(!appId) return nil;
-	for(NSString* appPath in trollStoreInstalledAppBundlePaths())
+	for(NSString* appPath in luiseStoreInstalledAppBundlePaths())
 	{
 		if([appIdForAppPath(appPath) isEqualToString:appId])
 		{
@@ -217,30 +217,30 @@ NSArray* TSURLScheme(void)
 
 BOOL getTSURLSchemeState(NSString* customAppPath)
 {
-	NSString* pathToUse = customAppPath ?: trollStoreAppPath();
+	NSString* pathToUse = customAppPath ?: luiseStoreAppPath();
 
-	NSDictionary* trollStoreInfoDict = infoDictionaryForAppPath(pathToUse);
-	return (BOOL)trollStoreInfoDict[@"CFBundleURLTypes"];
+	NSDictionary* luiseStoreInfoDict = infoDictionaryForAppPath(pathToUse);
+	return (BOOL)luiseStoreInfoDict[@"CFBundleURLTypes"];
 }
 
 void setTSURLSchemeState(BOOL newState, NSString* customAppPath)
 {
-	NSString* tsAppPath = trollStoreAppPath();
+	NSString* tsAppPath = luiseStoreAppPath();
 	NSString* pathToUse = customAppPath ?: tsAppPath;
 	if(newState != getTSURLSchemeState(pathToUse))
 	{
-		NSDictionary* trollStoreInfoDict = infoDictionaryForAppPath(pathToUse);
-		NSMutableDictionary* trollStoreInfoDictM = trollStoreInfoDict.mutableCopy;
+		NSDictionary* luiseStoreInfoDict = infoDictionaryForAppPath(pathToUse);
+		NSMutableDictionary* luiseStoreInfoDictM = luiseStoreInfoDict.mutableCopy;
 		if(newState)
 		{
-			trollStoreInfoDictM[@"CFBundleURLTypes"] = TSURLScheme();
+			luiseStoreInfoDictM[@"CFBundleURLTypes"] = TSURLScheme();
 		}
 		else
 		{
-			[trollStoreInfoDictM removeObjectForKey:@"CFBundleURLTypes"];
+			[luiseStoreInfoDictM removeObjectForKey:@"CFBundleURLTypes"];
 		}
 		NSString* outPath = [pathToUse stringByAppendingPathComponent:@"Info.plist"];
-		[trollStoreInfoDictM.copy writeToURL:[NSURL fileURLWithPath:outPath] error:nil];
+		[luiseStoreInfoDictM.copy writeToURL:[NSURL fileURLWithPath:outPath] error:nil];
 	}
 }
 
@@ -263,8 +263,8 @@ void installLdid(NSString* ldidToCopyPath, NSString* ldidVersion)
 {
 	if(![[NSFileManager defaultManager] fileExistsAtPath:ldidToCopyPath]) return;
 
-	NSString* ldidPath = [trollStoreAppPath() stringByAppendingPathComponent:@"ldid"];
-	NSString* ldidVersionPath = [trollStoreAppPath() stringByAppendingPathComponent:@"ldid.version"];
+	NSString* ldidPath = [luiseStoreAppPath() stringByAppendingPathComponent:@"ldid"];
+	NSString* ldidVersionPath = [luiseStoreAppPath() stringByAppendingPathComponent:@"ldid.version"];
 
 	if([[NSFileManager defaultManager] fileExistsAtPath:ldidPath])
 	{
@@ -282,13 +282,13 @@ void installLdid(NSString* ldidToCopyPath, NSString* ldidVersion)
 
 BOOL isLdidInstalled(void)
 {
-	NSString* ldidPath = [trollStoreAppPath() stringByAppendingPathComponent:@"ldid"];
+	NSString* ldidPath = [luiseStoreAppPath() stringByAppendingPathComponent:@"ldid"];
 	return [[NSFileManager defaultManager] fileExistsAtPath:ldidPath];
 }
 
 NSString *getLdidPath(void)
 {
-	return [trollStoreAppPath() stringByAppendingPathComponent:@"ldid"];
+	return [luiseStoreAppPath() stringByAppendingPathComponent:@"ldid"];
 }
 
 #endif
@@ -919,8 +919,8 @@ int installApp(NSString* appPackagePath, BOOL sign, BOOL force, BOOL isTSUpdate,
 		NSURL* appBundleURL = findAppURLInBundleURL(bundleContainerURL);
 
 		// Make sure the installed app is a LuiseStore app or the container is empty (or the force flag is set)
-		NSURL* trollStoreMarkURL = [bundleContainerURL URLByAppendingPathComponent:TS_ACTIVE_MARKER];
-		if(appBundleURL && ![trollStoreMarkURL checkResourceIsReachableAndReturnError:nil] && !force)
+		NSURL* luiseStoreMarkURL = [bundleContainerURL URLByAppendingPathComponent:TS_ACTIVE_MARKER];
+		if(appBundleURL && ![luiseStoreMarkURL checkResourceIsReachableAndReturnError:nil] && !force)
 		{
 			NSLog(@"[installApp] already installed and not a LuiseStore app... bailing out");
 			return 171;
@@ -1037,15 +1037,15 @@ int installApp(NSString* appPackagePath, BOOL sign, BOOL force, BOOL isTSUpdate,
 	appContainer = [MCMAppContainer containerWithIdentifier:appId createIfNecessary:NO existed:nil error:nil];
 
 	// Mark app as LuiseStore app
-	NSURL* trollStoreMarkURL = [appContainer.url URLByAppendingPathComponent:TS_ACTIVE_MARKER];
-	if(![[NSFileManager defaultManager] fileExistsAtPath:trollStoreMarkURL.path])
+	NSURL* luiseStoreMarkURL = [appContainer.url URLByAppendingPathComponent:TS_ACTIVE_MARKER];
+	if(![[NSFileManager defaultManager] fileExistsAtPath:luiseStoreMarkURL.path])
 	{
 		NSError* creationError;
 		NSData* emptyData = [NSData data];
-		BOOL marked = [emptyData writeToURL:trollStoreMarkURL options:0 error:&creationError];
+		BOOL marked = [emptyData writeToURL:luiseStoreMarkURL options:0 error:&creationError];
 		if(!marked)
 		{
-			NSLog(@"[installApp] failed to mark %@ as LuiseStore app by creating %@, error: %@", appId, trollStoreMarkURL.path, creationError);
+			NSLog(@"[installApp] failed to mark %@ as LuiseStore app by creating %@, error: %@", appId, luiseStoreMarkURL.path, creationError);
 			return 177;
 		}
 	}
@@ -1218,7 +1218,7 @@ int installIpa(NSString* ipaPath, BOOL force, BOOL useInstalldMethod, BOOL skipU
 
 void uninstallAllApps(BOOL useCustomMethod)
 {
-	for(NSString* appPath in trollStoreInstalledAppBundlePaths())
+	for(NSString* appPath in luiseStoreInstalledAppBundlePaths())
 	{
 		uninstallAppById(appIdForAppPath(appPath), useCustomMethod);
 	}
@@ -1226,15 +1226,15 @@ void uninstallAllApps(BOOL useCustomMethod)
 
 int uninstallLuiseStore(BOOL unregister)
 {
-	NSString* trollStore = trollStorePath();
-	if(![[NSFileManager defaultManager] fileExistsAtPath:trollStore]) return NO;
+	NSString* luiseStore = luiseStorePath();
+	if(![[NSFileManager defaultManager] fileExistsAtPath:luiseStore]) return NO;
 
 	if(unregister)
 	{
-		registerPath(trollStoreAppPath(), YES, YES);
+		registerPath(luiseStoreAppPath(), YES, YES);
 	}
 
-	return [[NSFileManager defaultManager] removeItemAtPath:trollStore error:nil];
+	return [[NSFileManager defaultManager] removeItemAtPath:luiseStore error:nil];
 }
 
 int installLuiseStore(NSString* pathToTar)
@@ -1276,8 +1276,8 @@ int installLuiseStore(NSString* pathToTar)
 		NSComparisonResult result = [@"1.5.0" compare:toInstallVersion options:NSNumericSearch];
 		if(result != NSOrderedDescending)
 		{
-			NSString* existingLdidPath = [trollStoreAppPath() stringByAppendingPathComponent:@"ldid"];
-			NSString* existingLdidVersionPath = [trollStoreAppPath() stringByAppendingPathComponent:@"ldid.version"];
+			NSString* existingLdidPath = [luiseStoreAppPath() stringByAppendingPathComponent:@"ldid"];
+			NSString* existingLdidVersionPath = [luiseStoreAppPath() stringByAppendingPathComponent:@"ldid.version"];
 			if([[NSFileManager defaultManager] fileExistsAtPath:existingLdidPath])
 			{
 				NSString* tmpLdidPath = [tmpLuiseStorePath stringByAppendingPathComponent:@"ldid"];
@@ -1307,9 +1307,9 @@ int installLuiseStore(NSString* pathToTar)
 	LSApplicationProxy* persistenceHelperApp = findPersistenceHelperApp(PERSISTENCE_HELPER_TYPE_SYSTEM);
 	if(persistenceHelperApp)
 	{
-		NSString* trollStorePersistenceHelper = [tmpLuiseStorePath stringByAppendingPathComponent:@"PersistenceHelper"];
-		NSString* trollStoreRootHelper = [tmpLuiseStorePath stringByAppendingPathComponent:@"luisestorehelper"];
-		_installPersistenceHelper(persistenceHelperApp, trollStorePersistenceHelper, trollStoreRootHelper);
+		NSString* luiseStorePersistenceHelper = [tmpLuiseStorePath stringByAppendingPathComponent:@"PersistenceHelper"];
+		NSString* luiseStoreRootHelper = [tmpLuiseStorePath stringByAppendingPathComponent:@"luisestorehelper"];
+		_installPersistenceHelper(persistenceHelperApp, luiseStorePersistenceHelper, luiseStoreRootHelper);
 	}
 
 	int ret = installApp(tmpPackagePath, NO, YES, YES, YES, NO);
@@ -1320,11 +1320,11 @@ int installLuiseStore(NSString* pathToTar)
 
 void refreshAppRegistrations(BOOL system)
 {
-	registerPath(trollStoreAppPath(), NO, system);
+	registerPath(luiseStoreAppPath(), NO, system);
 
 	// the reason why there is even an option to register everything as user
 	// is because it fixes an issue where app permissions would reset during an icon cache reload
-	for(NSString* appPath in trollStoreInstalledAppBundlePaths())
+	for(NSString* appPath in luiseStoreInstalledAppBundlePaths())
 	{
 		registerPath(appPath, NO, system);
 	}
@@ -1389,17 +1389,17 @@ void installPersistenceHelper(NSString* systemAppId, NSString *persistenceHelper
 	if(findPersistenceHelperApp(PERSISTENCE_HELPER_TYPE_ALL)) return;
 
 	if (persistenceHelperBinary == nil) {
-		persistenceHelperBinary = [trollStoreAppPath() stringByAppendingPathComponent:@"PersistenceHelper"];
+		persistenceHelperBinary = [luiseStoreAppPath() stringByAppendingPathComponent:@"PersistenceHelper"];
 	}
 	if (rootHelperBinary == nil) {
-		rootHelperBinary = [trollStoreAppPath() stringByAppendingPathComponent:@"luisestorehelper"];
+		rootHelperBinary = [luiseStoreAppPath() stringByAppendingPathComponent:@"luisestorehelper"];
 	}
 	LSApplicationProxy* appProxy = [LSApplicationProxy applicationProxyForIdentifier:systemAppId];
 	if(!appProxy || ![appProxy.bundleType isEqualToString:@"System"]) return;
 
 	NSString* executablePath = appProxy.canonicalExecutablePath;
 	NSString* bundlePath = appProxy.bundleURL.path;
-	NSString* backupPath = [bundlePath stringByAppendingPathComponent:[[executablePath lastPathComponent] stringByAppendingString:@"_TROLLSTORE_BACKUP"]];
+	NSString* backupPath = [bundlePath stringByAppendingPathComponent:[[executablePath lastPathComponent] stringByAppendingString:@"_LUISESTORE_BACKUP"]];
 
 	if([[NSFileManager defaultManager] fileExistsAtPath:backupPath]) return;
 
@@ -1431,7 +1431,7 @@ void uninstallPersistenceHelper(void)
 	{
 		NSString* executablePath = systemAppProxy.canonicalExecutablePath;
 		NSString* bundlePath = systemAppProxy.bundleURL.path;
-		NSString* backupPath = [bundlePath stringByAppendingPathComponent:[[executablePath lastPathComponent] stringByAppendingString:@"_TROLLSTORE_BACKUP"]];
+		NSString* backupPath = [bundlePath stringByAppendingPathComponent:[[executablePath lastPathComponent] stringByAppendingString:@"_LUISESTORE_BACKUP"]];
 		if(![[NSFileManager defaultManager] fileExistsAtPath:backupPath]) return;
 
 		NSString* helperPath = [bundlePath stringByAppendingPathComponent:@"luisestorehelper"];
@@ -1607,8 +1607,8 @@ int MAIN_NAME(int argc, char *argv[], char *envp[])
 			NSString* appPath = args[1];
 			NSString* newRegistration = args[2];
 
-			NSString* trollStoreMark = [[appPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:TS_ACTIVE_MARKER];
-			if([[NSFileManager defaultManager] fileExistsAtPath:trollStoreMark])
+			NSString* luiseStoreMark = [[appPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:TS_ACTIVE_MARKER];
+			if([[NSFileManager defaultManager] fileExistsAtPath:luiseStoreMark])
 			{
 				registerPath(appPath, NO, [newRegistration isEqualToString:@"System"]);
 			}
@@ -1616,7 +1616,7 @@ int MAIN_NAME(int argc, char *argv[], char *envp[])
 		else if ([cmd isEqualToString:@"transfer-apps"])
 		{
 			bool oneFailed = false;
-			for (NSString *appBundlePath in trollStoreInactiveInstalledAppBundlePaths()) {
+			for (NSString *appBundlePath in luiseStoreInactiveInstalledAppBundlePaths()) {
 				NSLog(@"Transfering %@...", appBundlePath);
 
 				// Ldid lacks the entitlement to sign in place

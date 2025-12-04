@@ -3,7 +3,7 @@
 #import "CoreServices.h"
 #import <objc/runtime.h>
 #import "dlfcn.h"
-#import <TSUtil.h>
+#import <LSUtil.h>
 #import <version.h>
 
 // uicache on steroids

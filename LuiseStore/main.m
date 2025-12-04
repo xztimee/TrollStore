@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
-#import "TSAppDelegate.h"
-#import "TSUtil.h"
+#import "LSAppDelegate.h"
+#import "LSUtil.h"
 
-NSUserDefaults* trollStoreUserDefaults(void)
+NSUserDefaults* luiseStoreUserDefaults(void)
 {
 	return [[NSUserDefaults alloc] initWithSuiteName:[NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Library/Preferences/%@.plist", APP_ID]]];
 }
@@ -10,6 +10,6 @@ NSUserDefaults* trollStoreUserDefaults(void)
 int main(int argc, char *argv[]) {
 	@autoreleasepool {
 		chineseWifiFixup();
-		return UIApplicationMain(argc, argv, nil, NSStringFromClass(TSAppDelegate.class));
+		return UIApplicationMain(argc, argv, nil, NSStringFromClass(LSAppDelegate.class));
 	}
 }

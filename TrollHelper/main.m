@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
-#import "TSHAppDelegateNoScene.h"
-#import "TSHAppDelegateWithScene.h"
-#import "TSHSceneDelegate.h"
-#import <TSUtil.h>
+#import "LSHAppDelegateNoScene.h"
+#import "LSHAppDelegateWithScene.h"
+#import "LSHSceneDelegate.h"
+#import <LSUtil.h>
 #import <objc/runtime.h>
 
 BOOL sceneDelegateFix(void)
@@ -57,7 +57,7 @@ BOOL sceneDelegateFix(void)
 
 	if(sceneDelegateClassName && [sceneDelegateClassName isKindOfClass:NSString.class])
 	{
-		Class newClass = objc_allocateClassPair([TSHSceneDelegate class], sceneDelegateClassName.UTF8String, 0);
+		Class newClass = objc_allocateClassPair([LSHSceneDelegate class], sceneDelegateClassName.UTF8String, 0);
 		objc_registerClassPair(newClass);
 		return YES;
 	}
@@ -80,11 +80,11 @@ int main(int argc, char *argv[], char *envp[]) {
 		chineseWifiFixup();
 		if(sceneDelegateFix())
 		{
-			return UIApplicationMain(argc, argv, nil, NSStringFromClass(TSHAppDelegateWithScene.class));
+			return UIApplicationMain(argc, argv, nil, NSStringFromClass(LSHAppDelegateWithScene.class));
 		}
 		else
 		{
-			return UIApplicationMain(argc, argv, nil, NSStringFromClass(TSHAppDelegateNoScene.class));
+			return UIApplicationMain(argc, argv, nil, NSStringFromClass(LSHAppDelegateNoScene.class));
 		}
 	}
 }
