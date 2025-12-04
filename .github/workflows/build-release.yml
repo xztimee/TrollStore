@@ -86,7 +86,6 @@ jobs:
 
       - name: Build TrollStore
         timeout-minutes: 45
-        working-directory: TrollStore
         run: |
           make all
 
@@ -95,22 +94,20 @@ jobs:
           mkdir -p artifacts
 
       - name: Collect build outputs from _build directory
-        working-directory: TrollStore
         run: |
           # Collect tar and ipa files from _build directory
           if [ -d "_build" ]; then
             echo "Collecting artifacts from _build directory..."
-            find _build -type f \( -name "*.tar" -o -name "*.ipa" \) -exec cp -v {} ../artifacts/ \;
+            find _build -type f \( -name "*.tar" -o -name "*.ipa" \) -exec cp -v {} artifacts/ \;
           else
             echo "Warning: _build directory not found"
           fi
 
       - name: Collect deb packages
-        working-directory: TrollStore
         run: |
           # Find and collect all deb packages from .theos/packages directories
           echo "Collecting deb packages from .theos/packages directories..."
-          find . -type f -name "*.deb" -path "*/.theos/packages/*" -exec cp -v {} ../artifacts/ \;
+          find . -type f -name "*.deb" -path "*/.theos/packages/*" -exec cp -v {} artifacts/ \;
 
       - name: List collected artifacts
         run: |
@@ -129,7 +126,7 @@ jobs:
             echo "Version extracted from git tag: $VERSION"
           else
             # Fallback: Extract version from Info.plist
-            PLIST_PATH="TrollStore/TrollStore/Resources/Info.plist"
+            PLIST_PATH="TrollStore/Resources/Info.plist"
             if [ -f "$PLIST_PATH" ]; then
               # Use PlistBuddy to read CFBundleVersion
               VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH" 2>/dev/null || echo "")
@@ -168,9 +165,9 @@ jobs:
         with:
           name: failed-build-artifacts-${{ github.sha }}
           path: |
-            TrollStore/_build/
-            TrollStore/**/.theos/obj/
-            TrollStore/**/.theos/packages/
+            _build/
+            **/.theos/obj/
+            **/.theos/packages/
             artifacts/
           retention-days: 30
           if-no-files-found: warn
