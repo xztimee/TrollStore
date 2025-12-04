@@ -634,11 +634,11 @@ int signApp(NSString* appPath)
 				// These mimic the entitlements that Xcodes gives every app it signs
 				if (!entitlementsToUse) {
 					entitlementsToUse = @{
-						@"application-identifier" : @"TROLLTROLL.*",
-						@"com.apple.developer.team-identifier" : @"TROLLTROLL",
+						@"application-identifier" : @"LUISELUISE.*",
+						@"com.apple.developer.team-identifier" : @"LUISELUISE",
 						@"get-task-allow" : (__bridge id)kCFBooleanTrue,
 						@"keychain-access-groups" : @[
-							@"TROLLTROLL.*",
+							@"LUISELUISE.*",
 							@"com.apple.token"
 						],
 					}.mutableCopy;
