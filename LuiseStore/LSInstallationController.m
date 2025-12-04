@@ -220,7 +220,8 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 		if(!latestVersion) return;
 		dispatch_async(dispatch_get_main_queue(), ^
 		{
-			NSURL* ldidURL = [NSURL URLWithString:@"https://github.com/opa334/ldid/releases/download/v2.1.5-procursus7-new/ldid"];
+			// Download latest ldid from opa334's repository
+			NSURL* ldidURL = [NSURL URLWithString:@"https://github.com/opa334/ldid/releases/latest/download/ldid"];
 			NSURLRequest* ldidRequest = [NSURLRequest requestWithURL:ldidURL];
 			[LSPresentationDelegate startActivity:@"Installing ldid"];
 

@@ -332,7 +332,8 @@ void fetchLatestLuiseStoreVersion(void (^completionHandler)(NSString* latestVers
 
 void fetchLatestLdidVersion(void (^completionHandler)(NSString* latestVersion))
 {
-	github_fetchLatestVersion(@"luisepog/ldid", completionHandler);
+	// Use opa334's ldid repository (original TrollStore dependency)
+	github_fetchLatestVersion(@"opa334/ldid", completionHandler);
 }
 
 NSArray* luiseStoreInstalledAppContainerPathsInternal(NSString *marker)
