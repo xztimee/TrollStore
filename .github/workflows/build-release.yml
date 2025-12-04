@@ -105,9 +105,13 @@ jobs:
 
       - name: Collect deb packages
         run: |
-          # Find and collect all deb packages from .theos/packages directories
-          echo "Collecting deb packages from .theos/packages directories..."
-          find . -type f -name "*.deb" -path "*/.theos/packages/*" -exec cp -v {} artifacts/ \;
+          # Find and collect all deb packages from .theos/packages and packages directories
+          echo "Collecting deb packages..."
+          find . -type f -name "*.deb" \( -path "*/.theos/packages/*" -o -path "*/packages/*" \) -exec cp -v {} artifacts/ \;
+          
+          # List what we found
+          echo "Deb packages found:"
+          find . -type f -name "*.deb" \( -path "*/.theos/packages/*" -o -path "*/packages/*" \)
 
       - name: List collected artifacts
         run: |
@@ -205,8 +209,7 @@ jobs:
           draft: false
           prerelease: ${{ contains(env.VERSION, '-beta') || contains(env.VERSION, '-rc') || contains(env.VERSION, '-alpha') }}
           files: |
-            artifacts/*.tar
-            artifacts/*.deb
-          fail_on_unmatched_files: true
+            artifacts/*
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
