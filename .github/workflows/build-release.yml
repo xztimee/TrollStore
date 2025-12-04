@@ -44,7 +44,8 @@ jobs:
             /opt/homebrew/Cellar/openssl@3
             /opt/homebrew/Cellar/libarchive
             /opt/homebrew/Cellar/libplist
-          key: ${{ runner.os }}-homebrew-${{ hashFiles('.github/workflows/build-release.yml') }}-dpkg-ldid-procursus-make-openssl3-libarchive-libplist
+            /opt/homebrew/Cellar/libb2
+          key: ${{ runner.os }}-homebrew-${{ hashFiles('.github/workflows/build-release.yml') }}-dpkg-ldid-procursus-make-openssl3-libarchive-libplist-libb2
           restore-keys: |
             ${{ runner.os }}-homebrew-
 
@@ -56,7 +57,7 @@ jobs:
           echo "/opt/homebrew/opt/make/libexec/gnubin" >> $GITHUB_PATH
 
           # Install required packages via Homebrew
-          brew install dpkg ldid-procursus make openssl@3 libarchive libplist
+          brew install dpkg ldid-procursus make openssl@3 libarchive libplist libb2
           
           # Link packages that may not be linked by default
           brew link --overwrite dpkg || true
@@ -64,6 +65,7 @@ jobs:
           brew link --overwrite make || true
           brew link --force --overwrite libarchive || true
           brew link --force --overwrite libplist || true
+          brew link --force --overwrite libb2 || true
           
           # Verify libarchive installation
           echo "Checking libarchive installation..."
