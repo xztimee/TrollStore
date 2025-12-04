@@ -17,16 +17,16 @@ $(HELPER_NAME)_FILES = $(wildcard *.m) $(wildcard ../Shared/*.m) $(wildcard ../C
 ifndef TROLLSTORE_LITE
 $(HELPER_NAME)_FILES += ../Exploits/fastPathSign/src/coretrust_bug.c ../Exploits/fastPathSign/src/codesign.m
 $(HELPER_NAME)_CODESIGN_FLAGS = --entitlements entitlements.plist
-$(HELPER_NAME)_LDFLAGS = -L../ChOma/external/ios -lcrypto
+$(HELPER_NAME)_LDFLAGS = -L../ChOma/external/ios -lcrypto -L/opt/homebrew/opt/libarchive/lib
 else
 $(HELPER_NAME)_CODESIGN_FLAGS = -Sentitlements.plist
+$(HELPER_NAME)_LDFLAGS = -L/opt/homebrew/opt/libarchive/lib
 endif
  
 $(HELPER_NAME)_CFLAGS = -fobjc-arc -I../Shared $(shell pkg-config --cflags libcrypto) -I../ChOma/src -I../Exploits/fastPathSign/src -I/opt/homebrew/opt/libarchive/include
 
 $(HELPER_NAME)_INSTALL_PATH = /usr/local/bin
 $(HELPER_NAME)_LIBRARIES = archive
-$(HELPER_NAME)_LDFLAGS += -L/opt/homebrew/opt/libarchive/lib
 $(HELPER_NAME)_FRAMEWORKS = CoreTelephony
 $(HELPER_NAME)_PRIVATE_FRAMEWORKS = SpringBoardServices BackBoardServices MobileContainerManager FrontBoardServices RunningBoardServices
 
