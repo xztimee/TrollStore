@@ -39,11 +39,11 @@
 				}
 				else if([url.pathExtension.lowercaseString isEqualToString:@"tar"])
 				{
-					// Update TrollStore itself
-					NSLog(@"Updating TrollStore...");
-					int ret = spawnRoot(rootHelperPath(), @[@"install-trollstore", url.path], nil, nil);
+					// Update LuiseStore itself
+					NSLog(@"Updating LuiseStore...");
+					int ret = spawnRoot(rootHelperPath(), @[@"install-luisestore", url.path], nil, nil);
 					doneBlock(ret == 0);
-					NSLog(@"Updated TrollStore!");
+					NSLog(@"Updated LuiseStore!");
 				}
 			}
 			else if([url.scheme isEqualToString:@"apple-magnifier"])
@@ -118,7 +118,7 @@
 		int ret = [appsManager enableJITForBundleID:appId];
 		if (ret != 0)
 		{
-			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error enabling JIT: trollstorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
+			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error enabling JIT: luisestorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
 			UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
 			[errorAlert addAction:closeAction];
 			[TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
@@ -127,7 +127,7 @@
 }
 
 // We want to auto install ldid if either it doesn't exist
-// or if it's the one from an old TrollStore version that's no longer supported
+// or if it's the one from an old LuiseStore version that's no longer supported
 - (void)handleLdidCheck
 {
 #ifndef TROLLSTORE_LITE

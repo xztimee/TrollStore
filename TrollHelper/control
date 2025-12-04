@@ -1,8 +1,8 @@
-Package: com.opa334.trollstorehelper
-Name: TrollStore Helper
+Package: com.luisepog.trollstorehelper
+Name: LuiseStore Helper
 Version: 2.1
 Architecture: iphoneos-arm
-Description: Helper utility to install and manage TrollStore!
-Maintainer: opa334
-Author: opa334
+Description: Helper utility to install and manage LuiseStore!
+Maintainer: luisepog
+Author: luisepog
 Section: Applications

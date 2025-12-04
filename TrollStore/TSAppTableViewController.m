@@ -217,7 +217,7 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 		int ret = [appsManager enableJITForBundleID:appId];
 		if (ret != 0)
 		{
-			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error enabling JIT: trollstorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
+			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error enabling JIT: luisestorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
 			UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
 			[errorAlert addAction:closeAction];
 			[TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
@@ -263,7 +263,7 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	if([newState isEqualToString:@"User"])
 	{
 		NSString* title = [NSString stringWithFormat:@"Switching '%@' to \"User\" Registration", [appInfo displayName]];
-		UIAlertController* confirmationAlert = [UIAlertController alertControllerWithTitle:title message:@"Switching this app to a \"User\" registration will make it unlaunchable after the next respring because the bugs exploited in TrollStore only affect apps registered as \"System\".\nThe purpose of this option is to make the app temporarily show up in settings, so you can adjust the settings and then switch it back to a \"System\" registration (TrollStore installed apps do not show up in settings otherwise). Additionally, the \"User\" registration state is also useful to temporarily fix iTunes file sharing, which also doesn't work for TrollStore installed apps otherwise.\nWhen you're done making the changes you need and want the app to become launchable again, you will need to switch it back to \"System\" state in TrollStore." preferredStyle:UIAlertControllerStyleAlert];
+		UIAlertController* confirmationAlert = [UIAlertController alertControllerWithTitle:title message:@"Switching this app to a \"User\" registration will make it unlaunchable after the next respring because the bugs exploited in LuiseStore only affect apps registered as \"System\".\nThe purpose of this option is to make the app temporarily show up in settings, so you can adjust the settings and then switch it back to a \"System\" registration (LuiseStore installed apps do not show up in settings otherwise). Additionally, the \"User\" registration state is also useful to temporarily fix iTunes file sharing, which also doesn't work for LuiseStore installed apps otherwise.\nWhen you're done making the changes you need and want the app to become launchable again, you will need to switch it back to \"System\" state in LuiseStore." preferredStyle:UIAlertControllerStyleAlert];
 
 		UIAlertAction* switchToUserAction = [UIAlertAction actionWithTitle:@"Switch to \"User\"" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action)
 		{

@@ -1,16 +1,16 @@
 TARGET := iphone:clang:16.5:14.0
-INSTALL_TARGET_PROCESSES = TrollStoreLite
+INSTALL_TARGET_PROCESSES = LuiseStoreLite
 ARCHS = arm64
 
 include $(THEOS)/makefiles/common.mk
 
-APPLICATION_NAME = TrollStoreLite
+APPLICATION_NAME = LuiseStoreLite
 
-TrollStoreLite_FILES = $(wildcard ../TrollStore/*.m) $(wildcard ../Shared/*.m)
-TrollStoreLite_FRAMEWORKS = UIKit CoreGraphics CoreServices CoreTelephony
-TrollStoreLite_PRIVATE_FRAMEWORKS = Preferences MobileIcons MobileContainerManager
-TrollStoreLite_LIBRARIES = archive
-TrollStoreLite_CFLAGS = -fobjc-arc -I../Shared -I$(shell brew --prefix)/opt/libarchive/include -DTROLLSTORE_LITE
-TrollStoreLite_CODESIGN_FLAGS = -Sentitlements.plist
+LuiseStoreLite_FILES = $(wildcard ../LuiseStore/*.m) $(wildcard ../Shared/*.m)
+LuiseStoreLite_FRAMEWORKS = UIKit CoreGraphics CoreServices CoreTelephony
+LuiseStoreLite_PRIVATE_FRAMEWORKS = Preferences MobileIcons MobileContainerManager
+LuiseStoreLite_LIBRARIES = archive
+LuiseStoreLite_CFLAGS = -fobjc-arc -I../Shared -I$(shell brew --prefix)/opt/libarchive/include -DTROLLSTORE_LITE
+LuiseStoreLite_CODESIGN_FLAGS = -Sentitlements.plist
 
 include $(THEOS_MAKE_PATH)/application.mk

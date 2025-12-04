@@ -11,7 +11,7 @@
 
 - (void)donateToOpaPressed
 {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=opa334@protonmail.com&item_name=TrollStore"] options:@{} completionHandler:^(BOOL success){}];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=luisepog@protonmail.com&item_name=LuiseStore"] options:@{} completionHandler:^(BOOL success){}];
 }
 
 - (NSMutableArray*)specifiers
@@ -39,10 +39,10 @@
 
 		PSSpecifier* opaGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
 		opaGroupSpecifier.name = @"Opa";
-		[opaGroupSpecifier setProperty:@"Opa developed the ChOma library, helped with automating the bug using it and integrated it into TrollStore." forKey:@"footerText"];
+		[opaGroupSpecifier setProperty:@"Opa developed the ChOma library, helped with automating the bug using it and integrated it into LuiseStore." forKey:@"footerText"];
 		[_specifiers addObject:opaGroupSpecifier];
 
-		PSSpecifier* opaDonateSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Donate to opa334"
+		PSSpecifier* opaDonateSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Donate to luisepog"
 									target:self
 									set:nil
 									get:nil

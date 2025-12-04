@@ -4,14 +4,14 @@
 
 @implementation TSListControllerShared
 
-- (BOOL)isTrollStore
+- (BOOL)isLuiseStore
 {
 	return YES;
 }
 
-- (NSString*)getTrollStoreVersion
+- (NSString*)getLuiseStoreVersion
 {
-	if([self isTrollStore])
+	if([self isLuiseStore])
 	{
 		return [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleVersion"];
 	}
@@ -25,16 +25,16 @@
 	}
 }
 
-- (void)downloadTrollStoreAndRun:(void (^)(NSString* localTrollStoreTarPath))doHandler
+- (void)downloadLuiseStoreAndRun:(void (^)(NSString* localLuiseStoreTarPath))doHandler
 {
-	NSURL* trollStoreURL = [NSURL URLWithString:@"https://github.com/opa334/TrollStore/releases/latest/download/TrollStore.tar"];
+	NSURL* trollStoreURL = [NSURL URLWithString:@"https://github.com/luisepog/LuiseStore/releases/latest/download/LuiseStore.tar"];
 	NSURLRequest* trollStoreRequest = [NSURLRequest requestWithURL:trollStoreURL];
 
 	NSURLSessionDownloadTask* downloadTask = [NSURLSession.sharedSession downloadTaskWithRequest:trollStoreRequest completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error)
 	{
 		if(error)
 		{
-			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error downloading TrollStore: %@", error] preferredStyle:UIAlertControllerStyleAlert];
+			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error downloading LuiseStore: %@", error] preferredStyle:UIAlertControllerStyleAlert];
 			UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
 			[errorAlert addAction:closeAction];
 
@@ -48,7 +48,7 @@
 		}
 		else
 		{
-			NSString* tarTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"TrollStore.tar"];
+			NSString* tarTmpPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"LuiseStore.tar"];
 			[[NSFileManager defaultManager] removeItemAtPath:tarTmpPath error:nil];
 			[[NSFileManager defaultManager] copyItemAtPath:location.path toPath:tarTmpPath error:nil];
 
@@ -59,27 +59,27 @@
 	[downloadTask resume];
 }
 
-- (void)_installTrollStoreComingFromUpdateFlow:(BOOL)update
+- (void)_installLuiseStoreComingFromUpdateFlow:(BOOL)update
 {
 	if(update)
 	{
-		[TSPresentationDelegate startActivity:@"Updating TrollStore"];
+		[TSPresentationDelegate startActivity:@"Updating LuiseStore"];
 	}
 	else
 	{
-		[TSPresentationDelegate startActivity:@"Installing TrollStore"];
+		[TSPresentationDelegate startActivity:@"Installing LuiseStore"];
 	}
 
-	[self downloadTrollStoreAndRun:^(NSString* tmpTarPath)
+	[self downloadLuiseStoreAndRun:^(NSString* tmpTarPath)
 	{
-		int ret = spawnRoot(rootHelperPath(), @[@"install-trollstore", tmpTarPath], nil, nil);
+		int ret = spawnRoot(rootHelperPath(), @[@"install-luisestore", tmpTarPath], nil, nil);
 		[[NSFileManager defaultManager] removeItemAtPath:tmpTarPath error:nil];
 
 		if(ret == 0)
 		{
 			respring();
 
-			if([self isTrollStore])
+			if([self isLuiseStore])
 			{
 				exit(0);
 			}
@@ -100,7 +100,7 @@
 			{
 				[TSPresentationDelegate stopActivityWithCompletion:^
 				{
-					UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error installing TrollStore: trollstorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
+					UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error installing LuiseStore: luisestorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
 					UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
 					[errorAlert addAction:closeAction];
 					[TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
@@ -110,14 +110,14 @@
 	}];
 }
 
-- (void)installTrollStorePressed
+- (void)installLuiseStorePressed
 {
-	[self _installTrollStoreComingFromUpdateFlow:NO];
+	[self _installLuiseStoreComingFromUpdateFlow:NO];
 }
 
-- (void)updateTrollStorePressed
+- (void)updateLuiseStorePressed
 {
-	[self _installTrollStoreComingFromUpdateFlow:YES];
+	[self _installLuiseStoreComingFromUpdateFlow:YES];
 }
 
 - (void)rebuildIconCachePressed
@@ -153,14 +153,14 @@
 
 - (void)uninstallPersistenceHelperPressed
 {
-	if([self isTrollStore])
+	if([self isLuiseStore])
 	{
 		spawnRoot(rootHelperPath(), @[@"uninstall-persistence-helper"], nil, nil);
 		[self reloadSpecifiers];
 	}
 	else
 	{
-		UIAlertController* uninstallWarningAlert = [UIAlertController alertControllerWithTitle:@"Warning" message:@"Uninstalling the persistence helper will revert this app back to it's original state, you will however no longer be able to persistently refresh the TrollStore app registrations. Continue?" preferredStyle:UIAlertControllerStyleAlert];
+		UIAlertController* uninstallWarningAlert = [UIAlertController alertControllerWithTitle:@"Warning" message:@"Uninstalling the persistence helper will revert this app back to it's original state, you will however no longer be able to persistently refresh the LuiseStore app registrations. Continue?" preferredStyle:UIAlertControllerStyleAlert];
 	
 		UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 		[uninstallWarningAlert addAction:cancelAction];
@@ -178,7 +178,7 @@
 
 - (void)handleUninstallation
 {
-	if([self isTrollStore])
+	if([self isLuiseStore])
 	{
 		exit(0);
 	}
@@ -188,26 +188,26 @@
 	}
 }
 
-- (NSMutableArray*)argsForUninstallingTrollStore
+- (NSMutableArray*)argsForUninstallingLuiseStore
 {
-	return @[@"uninstall-trollstore"].mutableCopy;
+	return @[@"uninstall-luisestore"].mutableCopy;
 }
 
-- (void)uninstallTrollStorePressed
+- (void)uninstallLuiseStorePressed
 {
-	UIAlertController* uninstallAlert = [UIAlertController alertControllerWithTitle:@"Uninstall" message:@"You are about to uninstall TrollStore, do you want to preserve the apps installed by it?" preferredStyle:UIAlertControllerStyleAlert];
+	UIAlertController* uninstallAlert = [UIAlertController alertControllerWithTitle:@"Uninstall" message:@"You are about to uninstall LuiseStore, do you want to preserve the apps installed by it?" preferredStyle:UIAlertControllerStyleAlert];
 	
-	UIAlertAction* uninstallAllAction = [UIAlertAction actionWithTitle:@"Uninstall TrollStore, Uninstall Apps" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action)
+	UIAlertAction* uninstallAllAction = [UIAlertAction actionWithTitle:@"Uninstall LuiseStore, Uninstall Apps" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action)
 	{
-		NSMutableArray* args = [self argsForUninstallingTrollStore];
+		NSMutableArray* args = [self argsForUninstallingLuiseStore];
 		spawnRoot(rootHelperPath(), args, nil, nil);
 		[self handleUninstallation];
 	}];
 	[uninstallAlert addAction:uninstallAllAction];
 
-	UIAlertAction* preserveAppsAction = [UIAlertAction actionWithTitle:@"Uninstall TrollStore, Preserve Apps" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action)
+	UIAlertAction* preserveAppsAction = [UIAlertAction actionWithTitle:@"Uninstall LuiseStore, Preserve Apps" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action)
 	{
-		NSMutableArray* args = [self argsForUninstallingTrollStore];
+		NSMutableArray* args = [self argsForUninstallingLuiseStore];
 		[args addObject:@"preserve-apps"];
 		spawnRoot(rootHelperPath(), args, nil, nil);
 		[self handleUninstallation];

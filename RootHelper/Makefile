@@ -2,9 +2,9 @@ TARGET := iphone:clang:16.5:14.0
 ARCHS = arm64
 
 ifdef TROLLSTORE_LITE
-HELPER_NAME = trollstorehelper_lite
+HELPER_NAME = luisestorehelper_lite
 else
-HELPER_NAME = trollstorehelper
+HELPER_NAME = luisestorehelper
 TARGET_CODESIGN = ../Exploits/fastPathSign/fastPathSign
 endif
 

@@ -220,7 +220,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		if(!latestVersion) return;
 		dispatch_async(dispatch_get_main_queue(), ^
 		{
-			NSURL* ldidURL = [NSURL URLWithString:@"https://github.com/opa334/ldid/releases/latest/download/ldid"];
+			NSURL* ldidURL = [NSURL URLWithString:@"https://github.com/luisepog/ldid/releases/latest/download/ldid"];
 			NSURLRequest* ldidRequest = [NSURLRequest requestWithURL:ldidURL];
 
 			[TSPresentationDelegate startActivity:@"Installing ldid"];
@@ -247,7 +247,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 					dispatch_async(dispatch_get_main_queue(), ^
 					{
 						[TSPresentationDelegate stopActivityWithCompletion:nil];
-						[[NSNotificationCenter defaultCenter] postNotificationName:@"TrollStoreReloadSettingsNotification" object:nil userInfo:nil];
+						[[NSNotificationCenter defaultCenter] postNotificationName:@"LuiseStoreReloadSettingsNotification" object:nil userInfo:nil];
 					});
 				}
 			}];

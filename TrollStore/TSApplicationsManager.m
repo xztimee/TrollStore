@@ -66,7 +66,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
         errorDescription = @"The app's Info.plist is missing required values.";
         break;
         case 177:
-        errorDescription = @"Failed to mark app as TrollStore app.";
+        errorDescription = @"Failed to mark app as LuiseStore app.";
         break;
         case 178:
         errorDescription = @"Failed to copy app bundle.";
@@ -93,7 +93,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
         errorDescription = @"Failed to sign the app. The CoreTrust bypass returned a non zero status code.";
     }
 
-    NSError* error = [NSError errorWithDomain:TrollStoreErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
+    NSError* error = [NSError errorWithDomain:LuiseStoreErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
     return error;
 }
 

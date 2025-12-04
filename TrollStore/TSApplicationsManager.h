@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#define TROLLSTORE_ROOT_PATH @"/var/containers/Bundle/TrollStore"
+#define TROLLSTORE_ROOT_PATH @"/var/containers/Bundle/LuiseStore"
 #define TROLLSTORE_MAIN_PATH [TROLLSTORE_ROOT_PATH stringByAppendingPathComponent:@"Main"]
 #define TROLLSTORE_APPLICATIONS_PATH [TROLLSTORE_ROOT_PATH stringByAppendingPathComponent:@"Applications"]
 

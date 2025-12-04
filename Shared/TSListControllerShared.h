@@ -3,15 +3,15 @@
 #import <Preferences/PSSpecifier.h>
 
 @interface TSListControllerShared : PSListController
-- (BOOL)isTrollStore;
-- (NSString*)getTrollStoreVersion;
-- (void)downloadTrollStoreAndRun:(void (^)(NSString* localTrollStoreTarPath))doHandler;
-- (void)installTrollStorePressed;
-- (void)updateTrollStorePressed;
+- (BOOL)isLuiseStore;
+- (NSString*)getLuiseStoreVersion;
+- (void)downloadLuiseStoreAndRun:(void (^)(NSString* localLuiseStoreTarPath))doHandler;
+- (void)installLuiseStorePressed;
+- (void)updateLuiseStorePressed;
 - (void)rebuildIconCachePressed;
 - (void)refreshAppRegistrationsPressed;
 - (void)uninstallPersistenceHelperPressed;
 - (void)handleUninstallation;
-- (NSMutableArray*)argsForUninstallingTrollStore;
-- (void)uninstallTrollStorePressed;
+- (NSMutableArray*)argsForUninstallingLuiseStore;
+- (void)uninstallLuiseStorePressed;
 @end

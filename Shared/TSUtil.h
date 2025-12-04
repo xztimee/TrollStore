@@ -1,23 +1,23 @@
 @import Foundation;
 #import "CoreServices.h"
 
-#define TrollStoreErrorDomain @"TrollStoreErrorDomain"
+#define LuiseStoreErrorDomain @"LuiseStoreErrorDomain"
 
-#define TS_MARKER @"_TrollStore"
-#define TS_LITE_MARKER @"_TrollStoreLite"
-#define TS_NAME @"TrollStore"
+#define TS_MARKER @"_LuiseStore"
+#define TS_LITE_MARKER @"_LuiseStoreLite"
+#define TS_NAME @"LuiseStore"
 #define TS_LITE_NAME @"Trollstore Lite"
 
 #ifdef TROLLSTORE_LITE
 #define TS_ACTIVE_MARKER TS_LITE_MARKER
 #define TS_INACTIVE_MARKER TS_MARKER
-#define APP_ID @"com.opa334.TrollStoreLite"
+#define APP_ID @"com.luisepog.LuiseStoreLite"
 #define APP_NAME TS_LITE_NAME
 #define OTHER_APP_NAME TS_NAME
 #else
 #define TS_ACTIVE_MARKER TS_MARKER
 #define TS_INACTIVE_MARKER TS_LITE_MARKER
-#define APP_ID @"com.opa334.TrollStore"
+#define APP_ID @"com.luisepog.LuiseStore"
 #define APP_NAME TS_NAME
 #define OTHER_APP_NAME TS_LITE_NAME
 #endif
@@ -31,7 +31,7 @@ extern void printMultilineNSString(NSString* stringToPrint);
 extern int spawnRoot(NSString* path, NSArray* args, NSString** stdOut, NSString** stdErr);
 extern void killall(NSString* processName, BOOL softly);
 extern void respring(void);
-extern void fetchLatestTrollStoreVersion(void (^completionHandler)(NSString* latestVersion));
+extern void fetchLatestLuiseStoreVersion(void (^completionHandler)(NSString* latestVersion));
 extern void fetchLatestLdidVersion(void (^completionHandler)(NSString* latestVersion));
 
 extern NSArray* trollStoreInstalledAppBundlePaths(void);

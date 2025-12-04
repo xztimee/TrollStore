@@ -18,12 +18,12 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 {
 	[super viewDidLoad];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:UIApplicationWillEnterForegroundNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:@"TrollStoreReloadSettingsNotification" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:@"LuiseStoreReloadSettingsNotification" object:nil];
 
 #ifndef TROLLSTORE_LITE
-	fetchLatestTrollStoreVersion(^(NSString* latestVersion)
+	fetchLatestLuiseStoreVersion(^(NSString* latestVersion)
 	{
-		NSString* currentVersion = [self getTrollStoreVersion];
+		NSString* currentVersion = [self getLuiseStoreVersion];
 		NSComparisonResult result = [currentVersion compare:latestVersion options:NSNumericSearch];
 		if(result == NSOrderedAscending)
 		{
@@ -78,21 +78,21 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 #ifndef TROLLSTORE_LITE
 		if(_newerVersion)
 		{
-			PSSpecifier* updateTrollStoreGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
-			updateTrollStoreGroupSpecifier.name = @"Update Available";
-			[_specifiers addObject:updateTrollStoreGroupSpecifier];
+			PSSpecifier* updateLuiseStoreGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+			updateLuiseStoreGroupSpecifier.name = @"Update Available";
+			[_specifiers addObject:updateLuiseStoreGroupSpecifier];
 
-			PSSpecifier* updateTrollStoreSpecifier = [PSSpecifier preferenceSpecifierNamed:[NSString stringWithFormat:@"Update TrollStore to %@", _newerVersion]
+			PSSpecifier* updateLuiseStoreSpecifier = [PSSpecifier preferenceSpecifierNamed:[NSString stringWithFormat:@"Update LuiseStore to %@", _newerVersion]
 										target:self
 										set:nil
 										get:nil
 										detail:nil
 										cell:PSButtonCell
 										edit:nil];
-			updateTrollStoreSpecifier.identifier = @"updateTrollStore";
-			[updateTrollStoreSpecifier setProperty:@YES forKey:@"enabled"];
-			updateTrollStoreSpecifier.buttonAction = @selector(updateTrollStorePressed);
-			[_specifiers addObject:updateTrollStoreSpecifier];
+			updateLuiseStoreSpecifier.identifier = @"updateLuiseStore";
+			[updateLuiseStoreSpecifier setProperty:@YES forKey:@"enabled"];
+			updateLuiseStoreSpecifier.buttonAction = @selector(updateLuiseStorePressed);
+			[_specifiers addObject:updateLuiseStoreSpecifier];
 		}
 
 		if(!_devModeEnabled)
@@ -206,11 +206,11 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 
 			if(ldidInstalled)
 			{
-				[signingGroupSpecifier setProperty:@"ldid is installed and allows TrollStore to install unsigned IPA files." forKey:@"footerText"];
+				[signingGroupSpecifier setProperty:@"ldid is installed and allows LuiseStore to install unsigned IPA files." forKey:@"footerText"];
 			}
 			else
 			{
-				[signingGroupSpecifier setProperty:@"In order for TrollStore to be able to install unsigned IPAs, ldid has to be installed using this button. It can't be directly included in TrollStore because of licensing issues." forKey:@"footerText"];
+				[signingGroupSpecifier setProperty:@"In order for LuiseStore to be able to install unsigned IPAs, ldid has to be installed using this button. It can't be directly included in LuiseStore because of licensing issues." forKey:@"footerText"];
 			}
 
 			[_specifiers addObject:signingGroupSpecifier];
@@ -270,9 +270,9 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		persistenceGroupSpecifier.name = @"Persistence";
 		[_specifiers addObject:persistenceGroupSpecifier];
 
-		if([[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/TrollStorePersistenceHelper.app"])
+		if([[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/LuiseStorePersistenceHelper.app"])
 		{
-			[persistenceGroupSpecifier setProperty:@"When iOS rebuilds the icon cache, all TrollStore apps including TrollStore itself will be reverted to \"User\" state and either disappear or no longer launch. If that happens, you can use the TrollHelper app on the home screen to refresh the app registrations, which will make them work again." forKey:@"footerText"];
+			[persistenceGroupSpecifier setProperty:@"When iOS rebuilds the icon cache, all LuiseStore apps including LuiseStore itself will be reverted to \"User\" state and either disappear or no longer launch. If that happens, you can use the TrollHelper app on the home screen to refresh the app registrations, which will make them work again." forKey:@"footerText"];
 			PSSpecifier* installedPersistenceHelperSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Helper Installed as Standalone App"
 											target:self
 											set:nil
@@ -291,7 +291,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 			{
 				NSString* appName = [persistenceApp localizedName];
 
-				[persistenceGroupSpecifier setProperty:[NSString stringWithFormat:@"When iOS rebuilds the icon cache, all TrollStore apps including TrollStore itself will be reverted to \"User\" state and either disappear or no longer launch. If that happens, you can use the persistence helper installed into %@ to refresh the app registrations, which will make them work again.", appName] forKey:@"footerText"];
+				[persistenceGroupSpecifier setProperty:[NSString stringWithFormat:@"When iOS rebuilds the icon cache, all LuiseStore apps including LuiseStore itself will be reverted to \"User\" state and either disappear or no longer launch. If that happens, you can use the persistence helper installed into %@ to refresh the app registrations, which will make them work again.", appName] forKey:@"footerText"];
 				PSSpecifier* installedPersistenceHelperSpecifier = [PSSpecifier preferenceSpecifierNamed:[NSString stringWithFormat:@"Helper Installed into %@", appName]
 												target:self
 												set:nil
@@ -319,7 +319,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 			}
 			else
 			{
-				[persistenceGroupSpecifier setProperty:@"When iOS rebuilds the icon cache, all TrollStore apps including TrollStore itself will be reverted to \"User\" state and either disappear or no longer launch. The only way to have persistence in a rootless environment is to replace a system application, here you can select a system app to replace with a persistence helper that can be used to refresh the registrations of all TrollStore related apps in case they disappear or no longer launch." forKey:@"footerText"];
+				[persistenceGroupSpecifier setProperty:@"When iOS rebuilds the icon cache, all LuiseStore apps including LuiseStore itself will be reverted to \"User\" state and either disappear or no longer launch. The only way to have persistence in a rootless environment is to replace a system application, here you can select a system app to replace with a persistence helper that can be used to refresh the registrations of all LuiseStore related apps in case they disappear or no longer launch." forKey:@"footerText"];
 
 				_installPersistenceHelperSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Install Persistence Helper"
 												target:self
@@ -338,7 +338,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 
 		PSSpecifier* installationSettingsGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
 		installationSettingsGroupSpecifier.name = @"Security";
-		[installationSettingsGroupSpecifier setProperty:@"The URL Scheme, when enabled, will allow apps and websites to trigger TrollStore installations through the apple-magnifier://install?url=<IPA_URL> URL scheme and enable JIT through the apple-magnifier://enable-jit?bundle-id=<BUNDLE_ID> URL scheme." forKey:@"footerText"];
+		[installationSettingsGroupSpecifier setProperty:@"The URL Scheme, when enabled, will allow apps and websites to trigger LuiseStore installations through the apple-magnifier://install?url=<IPA_URL> URL scheme and enable JIT through the apple-magnifier://enable-jit?bundle-id=<BUNDLE_ID> URL scheme." forKey:@"footerText"];
 
 		[_specifiers addObject:installationSettingsGroupSpecifier];
 
@@ -370,7 +370,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		[_specifiers addObject:installAlertConfigurationSpecifier];
 
 		PSSpecifier* otherGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
-		[otherGroupSpecifier setProperty:[NSString stringWithFormat:@"%@ %@\n\n© 2022-2024 Lars Fröder (opa334)\n\nTrollStore is NOT for piracy!\n\nCredits:\nGoogle TAG, @alfiecg_dev: CoreTrust bug\n@lunotech11, @SerenaKit, @tylinux, @TheRealClarity, @dhinakg, @khanhduytran0: Various contributions\n@ProcursusTeam: uicache, ldid\n@cstar_ow: uicache\n@saurik: ldid", APP_NAME, [self getTrollStoreVersion]] forKey:@"footerText"];
+		[otherGroupSpecifier setProperty:[NSString stringWithFormat:@"%@ %@\n\n© 2022-2024 Lars Fröder (luisepog)\n\nLuiseStore is NOT for piracy!\n\nCredits:\nGoogle TAG, @alfiecg_dev: CoreTrust bug\n@lunotech11, @SerenaKit, @tylinux, @TheRealClarity, @dhinakg, @khanhduytran0: Various contributions\n@ProcursusTeam: uicache, ldid\n@cstar_ow: uicache\n@saurik: ldid", APP_NAME, [self getLuiseStoreVersion]] forKey:@"footerText"];
 		[_specifiers addObject:otherGroupSpecifier];
 
 		PSSpecifier* advancedLinkSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Advanced"
@@ -396,19 +396,19 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		[_specifiers addObject:donateSpecifier];
 
 #ifndef TROLLSTORE_LITE
-		// Uninstall TrollStore
-		PSSpecifier* uninstallTrollStoreSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Uninstall TrollStore"
+		// Uninstall LuiseStore
+		PSSpecifier* uninstallLuiseStoreSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Uninstall LuiseStore"
 										target:self
 										set:nil
 										get:nil
 										detail:nil
 										cell:PSButtonCell
 										edit:nil];
-		uninstallTrollStoreSpecifier.identifier = @"uninstallTrollStore";
-		[uninstallTrollStoreSpecifier setProperty:@YES forKey:@"enabled"];
-		[uninstallTrollStoreSpecifier setProperty:NSClassFromString(@"PSDeleteButtonCell") forKey:@"cellClass"];
-		uninstallTrollStoreSpecifier.buttonAction = @selector(uninstallTrollStorePressed);
-		[_specifiers addObject:uninstallTrollStoreSpecifier];
+		uninstallLuiseStoreSpecifier.identifier = @"uninstallLuiseStore";
+		[uninstallLuiseStoreSpecifier setProperty:@YES forKey:@"enabled"];
+		[uninstallLuiseStoreSpecifier setProperty:NSClassFromString(@"PSDeleteButtonCell") forKey:@"cellClass"];
+		uninstallLuiseStoreSpecifier.buttonAction = @selector(uninstallLuiseStorePressed);
+		[_specifiers addObject:uninstallLuiseStoreSpecifier];
 #endif
 		/*PSSpecifier* doTheDashSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Do the Dash"
 										target:self
@@ -419,7 +419,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 										edit:nil];
 		doTheDashSpecifier.identifier = @"doTheDash";
 		[doTheDashSpecifier setProperty:@YES forKey:@"enabled"];
-		uninstallTrollStoreSpecifier.buttonAction = @selector(doTheDashPressed);
+		uninstallLuiseStoreSpecifier.buttonAction = @selector(doTheDashPressed);
 		[_specifiers addObject:doTheDashSpecifier];*/
 	}
 
@@ -496,7 +496,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		}
 	}];
 
-	UIAlertController* selectAppAlert = [UIAlertController alertControllerWithTitle:@"Select App" message:@"Select a system app to install the TrollStore Persistence Helper into. The normal function of the app will not be available, so it is recommended to pick something useless like the Tips app." preferredStyle:UIAlertControllerStyleActionSheet];
+	UIAlertController* selectAppAlert = [UIAlertController alertControllerWithTitle:@"Select App" message:@"Select a system app to install the LuiseStore Persistence Helper into. The normal function of the app will not be available, so it is recommended to pick something useless like the Tips app." preferredStyle:UIAlertControllerStyleActionSheet];
 	for(LSApplicationProxy* appProxy in appCandidates)
 	{
 		UIAlertAction* installAction = [UIAlertAction actionWithTitle:[appProxy localizedName] style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
@@ -612,9 +612,9 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 	return toReturn;
 }
 
-- (NSMutableArray*)argsForUninstallingTrollStore
+- (NSMutableArray*)argsForUninstallingLuiseStore
 {
-	NSMutableArray* args = @[@"uninstall-trollstore"].mutableCopy;
+	NSMutableArray* args = @[@"uninstall-luisestore"].mutableCopy;
 
 	NSNumber* uninstallationMethodToUseNum = [trollStoreUserDefaults() objectForKey:@"uninstallationMethod"];
     int uninstallationMethodToUse = uninstallationMethodToUseNum ? uninstallationMethodToUseNum.intValue : 0;

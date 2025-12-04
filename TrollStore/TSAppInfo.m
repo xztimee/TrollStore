@@ -100,7 +100,7 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 			if(!_cachedAppBundleName)
 			{
 				NSString* errorDescription = @"Unable to locate app bundle inside the .IPA archive.";
-				outError = [NSError errorWithDomain:TrollStoreErrorDomain code:301 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
+				outError = [NSError errorWithDomain:LuiseStoreErrorDomain code:301 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
 			}
 		}
 	}
@@ -182,7 +182,7 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 	if(!_cachedInfoDictionary)
 	{
 		NSString* errorDescription = @"Unable to locate Info.plist inside app bundle.";
-		return [NSError errorWithDomain:TrollStoreErrorDomain code:302 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
+		return [NSError errorWithDomain:LuiseStoreErrorDomain code:302 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
 	}
 	
 	return nil;
@@ -221,7 +221,7 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 				if(!mainBinaryEntry)
 				{
 					NSString* errorDescription = @"Unable to locate main binary inside app bundle.";
-					return [NSError errorWithDomain:TrollStoreErrorDomain code:303 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
+					return [NSError errorWithDomain:LuiseStoreErrorDomain code:303 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
 				}
 				
 				size_t size = archive_entry_size(mainBinaryEntry);
@@ -264,7 +264,7 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 				if(![[NSFileManager defaultManager] fileExistsAtPath:bundleExecutablePath])
 				{
 					NSString* errorDescription = @"Unable to locate main binary inside app bundle.";
-					return [NSError errorWithDomain:TrollStoreErrorDomain code:303 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
+					return [NSError errorWithDomain:LuiseStoreErrorDomain code:303 userInfo:@{NSLocalizedDescriptionKey : errorDescription}];
 				}
 
 				entitlementsByBinarySubpaths[bundleExecutable] = dumpEntitlementsFromBinaryAtPath(bundleExecutablePath);

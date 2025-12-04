@@ -1,9 +1,9 @@
-Package: com.opa334.trollstorelite
-Name: TrollStore Lite
+Package: com.luisepog.trollstorelite
+Name: LuiseStore Lite
 Version: 2.1
 Architecture: iphoneos-arm
-Description: TrollStore for jailbroken iOS
+Description: LuiseStore for jailbroken iOS
 Depends: ldid
-Maintainer: opa334
-Author: opa334
+Maintainer: luisepog
+Author: luisepog
 Section: Applications
