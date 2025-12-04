@@ -244,7 +244,7 @@ void setTSURLSchemeState(BOOL newState, NSString* customAppPath)
 	}
 }
 
-#ifdef TROLLSTORE_LITE
+#ifdef LUISESTORE_LITE
 
 BOOL isLdidInstalled(void)
 {
@@ -559,7 +559,7 @@ int signApp(NSString* appPath)
 
 	if(![[NSFileManager defaultManager] fileExistsAtPath:mainExecutablePath]) return 174;
 
-#ifndef TROLLSTORE_LITE
+#ifndef LUISESTORE_LITE
 	// Check if the bundle has had a supported exploit pre-applied
 	EXPLOIT_TYPE declaredPreAppliedExploitType = getDeclaredExploitTypeFromInfoDictionary(appInfoDict);
 	if(isPlatformVulnerableToExploitType(declaredPreAppliedExploitType))
@@ -647,7 +647,7 @@ int signApp(NSString* appPath)
 
 			if (!entitlementsToUse) entitlementsToUse = [NSMutableDictionary new];
 
-#ifndef TROLLSTORE_LITE
+#ifndef LUISESTORE_LITE
 			// Developer mode does not exist before iOS 16
 			if (@available(iOS 16, *)){
 				if (!requiresDevMode) {
@@ -709,7 +709,7 @@ int signApp(NSString* appPath)
 	int r = signAdhoc(appPath, nil);
 	if (r != 0) return r;
 
-#ifndef TROLLSTORE_LITE
+#ifndef LUISESTORE_LITE
 	// Apply CoreTrust bypass
 	enumerator = [[NSFileManager defaultManager] enumeratorAtURL:[NSURL fileURLWithPath:appPath] includingPropertiesForKeys:nil options:0 errorHandler:nil];
 	while(fileURL = [enumerator nextObject])
@@ -769,7 +769,7 @@ int signApp(NSString* appPath)
 		// Postpone trying to enable dev mode until after the app is (successfully) installed
 		return 182;
 	}
-#else // TROLLSTORE_LITE
+#else // LUISESTORE_LITE
 	// Just check for whether anything is fairplay encrypted
 	enumerator = [[NSFileManager defaultManager] enumeratorAtURL:[NSURL fileURLWithPath:appPath] includingPropertiesForKeys:nil options:0 errorHandler:nil];
 	while(fileURL = [enumerator nextObject])
@@ -1664,7 +1664,7 @@ int MAIN_NAME(int argc, char *argv[], char *envp[])
 			}
 			if (oneFailed) ret = -1;
 		}
-#ifndef TROLLSTORE_LITE
+#ifndef LUISESTORE_LITE
 		else if([cmd isEqualToString:@"install-luisestore"])
 		{
 			if(args.count < 2) return -3;
