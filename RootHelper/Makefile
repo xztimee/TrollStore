@@ -22,10 +22,11 @@ else
 $(HELPER_NAME)_CODESIGN_FLAGS = -Sentitlements.plist
 endif
  
-$(HELPER_NAME)_CFLAGS = -fobjc-arc -I../Shared $(shell pkg-config --cflags libcrypto) -I../ChOma/src -I../Exploits/fastPathSign/src -I$(shell brew --prefix)/opt/libarchive/include
+$(HELPER_NAME)_CFLAGS = -fobjc-arc -I../Shared $(shell pkg-config --cflags libcrypto) -I../ChOma/src -I../Exploits/fastPathSign/src -I/opt/homebrew/opt/libarchive/include
 
 $(HELPER_NAME)_INSTALL_PATH = /usr/local/bin
 $(HELPER_NAME)_LIBRARIES = archive
+$(HELPER_NAME)_LDFLAGS += -L/opt/homebrew/opt/libarchive/lib
 $(HELPER_NAME)_FRAMEWORKS = CoreTelephony
 $(HELPER_NAME)_PRIVATE_FRAMEWORKS = SpringBoardServices BackBoardServices MobileContainerManager FrontBoardServices RunningBoardServices
 
