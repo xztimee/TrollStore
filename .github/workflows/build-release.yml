@@ -93,6 +93,11 @@ jobs:
       - name: Build LuiseStore
         timeout-minutes: 45
         run: |
+          # Debug: Check brew prefix and libarchive location
+          echo "Brew prefix: $(brew --prefix)"
+          echo "Libarchive location: $(brew --prefix)/opt/libarchive"
+          ls -la $(brew --prefix)/opt/libarchive/include/ || echo "libarchive include not found"
+          
           make ci-build
 
       - name: Create artifacts staging directory
