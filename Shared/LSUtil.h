@@ -6,7 +6,7 @@
 #define TS_MARKER @"_LuiseStore"
 #define TS_LITE_MARKER @"_LuiseStoreLite"
 #define TS_NAME @"LuiseStore"
-#define TS_LITE_NAME @"Trollstore Lite"
+#define TS_LITE_NAME @"LuiseStore Lite"
 
 #ifdef LUISESTORE_LITE
 #define TS_ACTIVE_MARKER TS_LITE_MARKER
