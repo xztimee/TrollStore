@@ -117,22 +117,6 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 - (void)_setUpNavigationBar
 {
-	UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
-	[appearance configureWithDefaultBackground];
-	appearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterialDark];
-	appearance.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.03];
-	appearance.shadowColor = [UIColor colorWithWhite:1.0 alpha:0.06];
-	appearance.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
-	appearance.largeTitleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
-
-	self.navigationController.navigationBar.standardAppearance = appearance;
-	self.navigationController.navigationBar.scrollEdgeAppearance = appearance;
-	if (@available(iOS 15.0, *)) {
-		self.navigationController.navigationBar.compactAppearance = appearance;
-	}
-	self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-	self.navigationController.navigationBar.prefersLargeTitles = YES;
-
 	UIAction* installFromFileAction = [UIAction actionWithTitle:@"Install IPA File" image:[UIImage systemImageNamed:@"doc.badge.plus"] identifier:@"InstallIPAFile" handler:^(__kindof UIAction *action)
 	{
 		dispatch_async(dispatch_get_main_queue(), ^

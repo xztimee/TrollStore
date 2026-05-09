@@ -3,7 +3,9 @@
 #import "LSSettingsListController.h"
 #import <LSPresentationDelegate.h>
 
-@implementation LSRootViewController
+@implementation LSRootViewController {
+	UIView *_glassBackground;
+}
 
 - (void)loadView {
 	[super loadView];
@@ -29,90 +31,69 @@
 	[super viewDidLoad];
 
 	LSPresentationDelegate.presentationViewController = self;
-
-	[self _setupFloatingGlassTabBar];
-	[self _setupGlassNavigationBars];
+	[self setupGlassmorphismTabBar];
 }
 
-#pragma mark - Glassmorphism Tab Bar
-
-- (void)_setupFloatingGlassTabBar
-{
-	UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
-	[appearance configureWithTransparentBackground];
-	appearance.shadowColor = nil;
-	appearance.backgroundColor = [UIColor clearColor];
-
-	self.tabBar.standardAppearance = appearance;
-	if (@available(iOS 15.0, *)) {
-		self.tabBar.scrollEdgeAppearance = appearance;
+- (void)setupGlassmorphismTabBar {
+	// Make default tab bar background fully transparent
+	if (@available(iOS 13.0, *)) {
+		UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+		[appearance configureWithTransparentBackground];
+		appearance.stackedLayoutAppearance.normal.iconColor = [UIColor colorWithWhite:1.0 alpha:0.45];
+		appearance.stackedLayoutAppearance.selected.iconColor = [UIColor whiteColor];
+		appearance.stackedLayoutAppearance.normal.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithWhite:1.0 alpha:0.45]};
+		appearance.stackedLayoutAppearance.selected.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
+		self.tabBar.standardAppearance = appearance;
+		if (@available(iOS 15.0, *)) {
+			self.tabBar.scrollEdgeAppearance = appearance;
+		}
 	}
 
 	self.tabBar.tintColor = [UIColor whiteColor];
-	self.tabBar.unselectedItemTintColor = [UIColor colorWithWhite:1.0 alpha:0.4];
-	self.tabBar.backgroundImage = [UIImage new];
-	self.tabBar.shadowImage = [UIImage new];
 	self.tabBar.clipsToBounds = NO;
 
-	UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterialDark];
-	UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-	blurView.tag = 9999;
-	blurView.clipsToBounds = YES;
-	blurView.layer.cornerCurve = kCACornerCurveContinuous;
-	blurView.layer.borderWidth = 0.5;
-	blurView.layer.borderColor = [UIColor colorWithWhite:1.0 alpha:0.18].CGColor;
+	// Glass container with rounded corners
+	_glassBackground = [[UIView alloc] init];
+	_glassBackground.layer.cornerRadius = 22;
+	_glassBackground.clipsToBounds = YES;
 
-	[self.tabBar insertSubview:blurView atIndex:0];
+	// Blur effect for glassmorphism
+	UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterialDark];
+	UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
+	blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+	[_glassBackground addSubview:blurView];
+
+	// Subtle border for the glass edge
+	_glassBackground.layer.borderWidth = 0.5;
+	_glassBackground.layer.borderColor = [UIColor colorWithWhite:1.0 alpha:0.18].CGColor;
+
+	// Shadow for depth
+	self.tabBar.layer.shadowColor = [UIColor blackColor].CGColor;
+	self.tabBar.layer.shadowOffset = CGSizeMake(0, 4);
+	self.tabBar.layer.shadowRadius = 12;
+	self.tabBar.layer.shadowOpacity = 0.3;
+
+	[self.tabBar insertSubview:_glassBackground atIndex:0];
 }
 
-#pragma mark - Glassmorphism Navigation Bars
-
-- (void)_setupGlassNavigationBars
-{
-	UINavigationBarAppearance *navAppearance = [[UINavigationBarAppearance alloc] init];
-	[navAppearance configureWithDefaultBackground];
-	navAppearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterialDark];
-	navAppearance.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.15];
-	navAppearance.shadowColor = [UIColor colorWithWhite:1.0 alpha:0.05];
-	navAppearance.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
-	navAppearance.largeTitleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
-
-	for (UINavigationController *navController in self.viewControllers) {
-		navController.navigationBar.standardAppearance = navAppearance;
-		navController.navigationBar.scrollEdgeAppearance = navAppearance;
-		navController.navigationBar.tintColor = [UIColor whiteColor];
-		navController.navigationBar.prefersLargeTitles = YES;
-	}
-}
-
-#pragma mark - Layout
-
-- (void)viewDidLayoutSubviews
-{
+- (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
 
-	CGFloat sideMargin = 40.0;
-	CGFloat bottomMargin = 25.0;
-	CGFloat tabBarHeight = 64.0;
-	CGFloat cornerRadius = tabBarHeight / 2.0;
+	CGFloat floatMargin = 16;
+	CGFloat sideMargin = 16;
+	CGFloat safeBottom = self.view.safeAreaInsets.bottom;
+	CGFloat tabBarHeight = 60;
 
-	self.tabBar.frame = CGRectMake(
-		sideMargin,
-		self.view.bounds.size.height - tabBarHeight - bottomMargin,
-		self.view.bounds.size.width - (sideMargin * 2),
-		tabBarHeight
-	);
+	// Reposition the tab bar to float above the bottom
+	CGRect tabFrame = self.tabBar.frame;
+	tabFrame.size.height = tabBarHeight + safeBottom;
+	tabFrame.origin.y = self.view.frame.size.height - tabFrame.size.height - floatMargin;
+	self.tabBar.frame = tabFrame;
 
-	UIVisualEffectView *blurView = (UIVisualEffectView *)[self.tabBar viewWithTag:9999];
-	blurView.frame = self.tabBar.bounds;
-	blurView.layer.cornerRadius = cornerRadius;
-
-	self.tabBar.layer.cornerRadius = cornerRadius;
-	self.tabBar.layer.shadowColor = [UIColor blackColor].CGColor;
-	self.tabBar.layer.shadowOffset = CGSizeMake(0, 8);
-	self.tabBar.layer.shadowRadius = 24;
-	self.tabBar.layer.shadowOpacity = 0.4;
-	self.tabBar.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.tabBar.bounds cornerRadius:cornerRadius].CGPath;
+	// Position glass background with side margins, only covering the visible height (not safe area)
+	_glassBackground.frame = CGRectMake(sideMargin, 0, tabFrame.size.width - sideMargin * 2, tabBarHeight);
+	UIVisualEffectView *blurView = _glassBackground.subviews.firstObject;
+	blurView.frame = _glassBackground.bounds;
 }
 
 @end
