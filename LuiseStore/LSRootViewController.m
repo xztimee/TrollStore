@@ -30,8 +30,6 @@
 
 	LSPresentationDelegate.presentationViewController = self;
 
-	self.view.backgroundColor = [UIColor colorWithRed:0.06 green:0.07 blue:0.10 alpha:1.0];
-
 	[self _setupFloatingGlassTabBar];
 	[self _setupGlassNavigationBars];
 }
