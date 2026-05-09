@@ -79,18 +79,18 @@
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
 
-	CGFloat floatMargin = 16;
+	CGFloat floatMargin = 20;
 	CGFloat sideMargin = 16;
 	CGFloat safeBottom = self.view.safeAreaInsets.bottom;
-	CGFloat tabBarHeight = 60;
+	CGFloat tabBarHeight = 50;
 
 	// Reposition the tab bar to float above the bottom
 	CGRect tabFrame = self.tabBar.frame;
-	tabFrame.size.height = tabBarHeight + safeBottom;
-	tabFrame.origin.y = self.view.frame.size.height - tabFrame.size.height - floatMargin;
+	tabFrame.size.height = tabBarHeight;
+	tabFrame.origin.y = self.view.frame.size.height - tabBarHeight - floatMargin - safeBottom;
 	self.tabBar.frame = tabFrame;
 
-	// Position glass background with side margins, only covering the visible height (not safe area)
+	// Position glass background with side margins, filling the entire tab bar
 	_glassBackground.frame = CGRectMake(sideMargin, 0, tabFrame.size.width - sideMargin * 2, tabBarHeight);
 	UIVisualEffectView *blurView = _glassBackground.subviews.firstObject;
 	blurView.frame = _glassBackground.bounds;
