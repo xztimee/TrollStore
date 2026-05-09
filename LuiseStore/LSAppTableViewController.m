@@ -111,6 +111,9 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	self.tableView.allowsMultipleSelectionDuringEditing = NO;
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 
+	self.tableView.backgroundColor = [UIColor colorWithRed:0.06 green:0.07 blue:0.10 alpha:1.0];
+	self.tableView.separatorColor = [UIColor colorWithWhite:1.0 alpha:0.06];
+
 	[self _setUpNavigationBar];
 	[self _setUpSearchBar];
 }
@@ -371,9 +374,17 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 	// Configure the cell...
 	cell.textLabel.text = [appInfo displayName];
+	cell.textLabel.textColor = [UIColor whiteColor];
 	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ • %@", appVersion, appId];
-	cell.imageView.layer.borderWidth = 1;
-	cell.imageView.layer.borderColor = [UIColor.labelColor colorWithAlphaComponent:0.1].CGColor;
+	cell.detailTextLabel.textColor = [UIColor colorWithWhite:1.0 alpha:0.45];
+	cell.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.04];
+
+	UIView *selectedBg = [[UIView alloc] init];
+	selectedBg.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.08];
+	cell.selectedBackgroundView = selectedBg;
+
+	cell.imageView.layer.borderWidth = 0.5;
+	cell.imageView.layer.borderColor = [UIColor colorWithWhite:1.0 alpha:0.12].CGColor;
 	cell.imageView.layer.cornerRadius = 13.5;
 	cell.imageView.layer.masksToBounds = YES;
 	cell.imageView.layer.cornerCurve = kCACornerCurveContinuous;
