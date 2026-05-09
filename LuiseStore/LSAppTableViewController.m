@@ -127,7 +127,9 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 	self.navigationController.navigationBar.standardAppearance = appearance;
 	self.navigationController.navigationBar.scrollEdgeAppearance = appearance;
-	self.navigationController.navigationBar.compactAppearance = appearance;
+	if (@available(iOS 15.0, *)) {
+		self.navigationController.navigationBar.compactAppearance = appearance;
+	}
 	self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
 	self.navigationController.navigationBar.prefersLargeTitles = YES;
 
