@@ -417,7 +417,7 @@
 	self.navigationItem.leftBarButtonItem.enabled = !self.loading && candidates > 0;
 	self.navigationItem.rightBarButtonItem.enabled = !self.loading;
 	UIBarButtonItem *actionsButton = self.navigationItem.rightBarButtonItem;
-	UIAction *cleanAction = actionsButton.menu.children.firstObject;
+	UIAction *cleanAction = (UIAction *)actionsButton.menu.children.firstObject;
 	cleanAction.attributes = selected > 0
 		? UIMenuElementAttributesDestructive
 		: (UIMenuElementAttributesDestructive | UIMenuElementAttributesDisabled);
