@@ -15,6 +15,7 @@
 + (UIFont *)monoFontWithSize:(CGFloat)size weight:(UIFontWeight)weight;
 + (void)applyNavigationAppearance:(UINavigationController *)navigationController;
 + (void)styleTableView:(UITableView *)tableView;
++ (void)sizeHeaderForTableView:(UITableView *)tableView;
 + (CAGradientLayer *)auroraLayerForBounds:(CGRect)bounds;
 
 @end

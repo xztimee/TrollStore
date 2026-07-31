@@ -35,6 +35,11 @@
 		image:[UIImage systemImageNamed:@"sparkles"] selectedImage:nil];
 	settingsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings"
 		image:[UIImage systemImageNamed:@"slider.horizontal.3"] selectedImage:nil];
+	for (UITabBarItem *item in @[appNavigationController.tabBarItem, varCleanNavigationController.tabBarItem,
+		settingsNavigationController.tabBarItem]) {
+		item.titlePositionAdjustment = UIOffsetMake(0.0, 4.0);
+		item.imageInsets = UIEdgeInsetsMake(4.0, 0.0, -4.0, 0.0);
+	}
 
 	self.title = @"LuiseStore";
 	self.viewControllers = @[appNavigationController, varCleanNavigationController, settingsNavigationController];
@@ -63,6 +68,18 @@
 			NSForegroundColorAttributeName: LSUITheme.accentColor,
 			NSFontAttributeName: [LSUITheme bodyFontWithSize:10.0 weight:UIFontWeightSemibold]
 		};
+		appearance.inlineLayoutAppearance.normal.iconColor = LSUITheme.secondaryTextColor;
+		appearance.inlineLayoutAppearance.selected.iconColor = LSUITheme.accentColor;
+		appearance.inlineLayoutAppearance.normal.titleTextAttributes =
+			appearance.stackedLayoutAppearance.normal.titleTextAttributes;
+		appearance.inlineLayoutAppearance.selected.titleTextAttributes =
+			appearance.stackedLayoutAppearance.selected.titleTextAttributes;
+		appearance.compactInlineLayoutAppearance.normal.iconColor = LSUITheme.secondaryTextColor;
+		appearance.compactInlineLayoutAppearance.selected.iconColor = LSUITheme.accentColor;
+		appearance.compactInlineLayoutAppearance.normal.titleTextAttributes =
+			appearance.stackedLayoutAppearance.normal.titleTextAttributes;
+		appearance.compactInlineLayoutAppearance.selected.titleTextAttributes =
+			appearance.stackedLayoutAppearance.selected.titleTextAttributes;
 		self.tabBar.standardAppearance = appearance;
 		if (@available(iOS 15.0, *)) {
 			self.tabBar.scrollEdgeAppearance = appearance;
@@ -74,6 +91,7 @@
 	self.tabBar.backgroundImage = [UIImage new];
 	self.tabBar.shadowImage = [UIImage new];
 	self.tabBar.clipsToBounds = NO;
+	self.tabBar.itemPositioning = UITabBarItemPositioningCentered;
 
 	_glassBackground = [[UIView alloc] init];
 	_glassBackground.userInteractionEnabled = NO;
@@ -104,26 +122,21 @@
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
 
-	CGFloat floatMargin = 14.0;
 	CGFloat sideMargin = 16.0;
-	CGFloat safeBottom = self.view.safeAreaInsets.bottom;
-	CGFloat tabBarHeight = 58.0;
-	CGFloat availableWidth = self.view.bounds.size.width - (sideMargin * 2.0);
-	CGFloat tabBarWidth = MIN(availableWidth, 420.0);
-
-	CGRect tabFrame = self.tabBar.frame;
-	tabFrame.size.width = tabBarWidth;
-	tabFrame.size.height = tabBarHeight;
-	tabFrame.origin.x = floor((self.view.bounds.size.width - tabBarWidth) / 2.0);
-	tabFrame.origin.y = self.view.bounds.size.height - tabBarHeight - floatMargin - safeBottom;
-	self.tabBar.frame = tabFrame;
-
-	_glassBackground.frame = self.tabBar.bounds;
+	CGFloat itemAreaHeight = CGRectGetHeight(self.tabBar.bounds) - self.view.safeAreaInsets.bottom;
+	CGFloat tabBarHeight = MIN(58.0, MAX(49.0, itemAreaHeight));
+	CGFloat availableWidth = MAX(0.0, CGRectGetWidth(self.tabBar.bounds) - (sideMargin * 2.0));
+	CGFloat glassWidth = MIN(availableWidth, 420.0);
+	self.tabBar.itemWidth = floor(glassWidth / MAX(self.tabBar.items.count, 1));
+	self.tabBar.itemSpacing = 0.0;
+	CGFloat glassY = floor((itemAreaHeight - tabBarHeight) / 2.0) + 4.0;
+	_glassBackground.frame = CGRectMake(floor((CGRectGetWidth(self.tabBar.bounds) - glassWidth) / 2.0),
+		glassY, glassWidth, tabBarHeight);
 	UIVisualEffectView *blurView = _glassBackground.subviews.firstObject;
 	blurView.frame = _glassBackground.bounds;
 	_glassBackground.backgroundColor = LSUITheme.surfaceColor;
 	_auroraLayer.frame = blurView.bounds;
-	self.tabBar.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.tabBar.bounds cornerRadius:25.0].CGPath;
+	self.tabBar.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:_glassBackground.frame cornerRadius:25.0].CGPath;
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection

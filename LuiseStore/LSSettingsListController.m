@@ -36,14 +36,16 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 	UITableView *tableView = [self ls_tableView];
 	if (tableView) {
 		[LSUITheme styleTableView:tableView];
-		tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 96.0, 0.0);
-		tableView.verticalScrollIndicatorInsets = UIEdgeInsetsMake(0.0, 0.0, 88.0, 0.0);
+		tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 12.0, 0.0);
 		tableView.backgroundView = [self settingsBackgroundView];
 		tableView.tableHeaderView = [self settingsHeaderView];
+		[LSUITheme sizeHeaderForTableView:tableView];
 		[self styleVisibleCells];
 	}
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:UIApplicationWillEnterForegroundNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:@"LuiseStoreReloadSettingsNotification" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:)
+		name:UIContentSizeCategoryDidChangeNotification object:nil];
 
 #ifndef LUISESTORE_LITE
 	fetchLatestLuiseStoreVersion(^(NSString* latestVersion)
@@ -94,6 +96,19 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 	[self reloadSpecifiers];
 }
 
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification
+{
+	UITableView *tableView = [self ls_tableView];
+	if (!tableView) return;
+	[LSUITheme sizeHeaderForTableView:tableView];
+	[tableView reloadData];
+}
+
 - (UIView *)settingsBackgroundView
 {
 	UIView *backgroundView = [[UIView alloc] init];
@@ -107,29 +122,49 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 - (UIView *)settingsHeaderView
 {
 	CGFloat width = self.view.bounds.size.width;
-	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, width, 116.0)];
+	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, width, 1.0)];
 	headerView.backgroundColor = UIColor.clearColor;
 
-	UIView *accentMark = [[UIView alloc] initWithFrame:CGRectMake(20.0, 18.0, 30.0, 4.0)];
+	UIView *accentMark = [[UIView alloc] init];
+	accentMark.translatesAutoresizingMaskIntoConstraints = NO;
 	accentMark.backgroundColor = LSUITheme.accentColor;
 	accentMark.layer.cornerRadius = 2.0;
 	[headerView addSubview:accentMark];
 
-	UILabel *brandLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 32.0, width - 40.0, 32.0)];
+	UILabel *brandLabel = [[UILabel alloc] init];
+	brandLabel.translatesAutoresizingMaskIntoConstraints = NO;
 	brandLabel.text = @"LuiseStore";
 	brandLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleTitle1]
 		scaledFontForFont:[LSUITheme displayFontWithSize:28.0 weight:UIFontWeightBold]];
 	brandLabel.adjustsFontForContentSizeCategory = YES;
+	brandLabel.numberOfLines = 0;
 	brandLabel.textColor = LSUITheme.primaryTextColor;
 	[headerView addSubview:brandLabel];
 
 	NSString *version = [self getLuiseStoreVersion] ?: @"Unknown";
-	UILabel *versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 70.0, width - 40.0, 22.0)];
+	UILabel *versionLabel = [[UILabel alloc] init];
+	versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
 	versionLabel.text = [NSString stringWithFormat:@"CoreTrust utility  ·  v%@", version];
-	versionLabel.font = [LSUITheme monoFontWithSize:11.0 weight:UIFontWeightMedium];
+	versionLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption1]
+		scaledFontForFont:[LSUITheme monoFontWithSize:11.0 weight:UIFontWeightMedium]];
+	versionLabel.adjustsFontForContentSizeCategory = YES;
+	versionLabel.numberOfLines = 0;
 	versionLabel.textColor = LSUITheme.secondaryTextColor;
 	[headerView addSubview:versionLabel];
 
+	[NSLayoutConstraint activateConstraints:@[
+		[accentMark.leadingAnchor constraintEqualToAnchor:headerView.readableContentGuide.leadingAnchor],
+		[accentMark.topAnchor constraintEqualToAnchor:headerView.topAnchor constant:18.0],
+		[accentMark.widthAnchor constraintEqualToConstant:30.0],
+		[accentMark.heightAnchor constraintEqualToConstant:4.0],
+		[brandLabel.leadingAnchor constraintEqualToAnchor:headerView.readableContentGuide.leadingAnchor],
+		[brandLabel.trailingAnchor constraintEqualToAnchor:headerView.readableContentGuide.trailingAnchor],
+		[brandLabel.topAnchor constraintEqualToAnchor:accentMark.bottomAnchor constant:10.0],
+		[versionLabel.leadingAnchor constraintEqualToAnchor:brandLabel.leadingAnchor],
+		[versionLabel.trailingAnchor constraintEqualToAnchor:brandLabel.trailingAnchor],
+		[versionLabel.topAnchor constraintEqualToAnchor:brandLabel.bottomAnchor constant:5.0],
+		[versionLabel.bottomAnchor constraintEqualToAnchor:headerView.bottomAnchor constant:-18.0]
+	]];
 	return headerView;
 }
 
@@ -154,37 +189,17 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 
 - (void)styleCell:(UITableViewCell *)cell
 {
-	cell.backgroundColor = UIColor.clearColor;
 	cell.tintColor = LSUITheme.accentColor;
-	cell.textLabel.font = [LSUITheme bodyFontWithSize:16.0 weight:UIFontWeightRegular];
+	cell.textLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:16.0 weight:UIFontWeightRegular]];
 	cell.textLabel.textColor = LSUITheme.primaryTextColor;
-	cell.detailTextLabel.font = [LSUITheme bodyFontWithSize:13.0 weight:UIFontWeightRegular];
+	cell.detailTextLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleFootnote]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:13.0 weight:UIFontWeightRegular]];
 	cell.detailTextLabel.textColor = LSUITheme.secondaryTextColor;
 	cell.textLabel.adjustsFontForContentSizeCategory = YES;
 	cell.detailTextLabel.adjustsFontForContentSizeCategory = YES;
 	cell.accessoryView.tintColor = LSUITheme.accentColor;
-
-	UIView *background = cell.backgroundView;
-	UIView *card = [background viewWithTag:2001];
-	if (!card) {
-		background = [[UIView alloc] init];
-		card = [[UIView alloc] init];
-		card.tag = 2001;
-		card.translatesAutoresizingMaskIntoConstraints = NO;
-		[background addSubview:card];
-		[NSLayoutConstraint activateConstraints:@[
-			[card.leadingAnchor constraintEqualToAnchor:background.leadingAnchor constant:16.0],
-			[card.trailingAnchor constraintEqualToAnchor:background.trailingAnchor constant:-16.0],
-			[card.topAnchor constraintEqualToAnchor:background.topAnchor constant:2.0],
-			[card.bottomAnchor constraintEqualToAnchor:background.bottomAnchor constant:-2.0]
-		]];
-		cell.backgroundView = background;
-	}
-	card.backgroundColor = LSUITheme.surfaceColor;
-	card.layer.cornerRadius = 14.0;
-	card.layer.cornerCurve = kCACornerCurveContinuous;
-	card.layer.borderWidth = 0.5;
-	card.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.22].CGColor;
+	cell.backgroundColor = LSUITheme.surfaceColor;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -197,11 +212,7 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 	[super viewDidLayoutSubviews];
 	UITableView *tableView = [self ls_tableView];
 	if (!tableView) return;
-	UIView *headerView = tableView.tableHeaderView;
-	if (headerView && !CGRectEqualToRect(headerView.frame, CGRectMake(0.0, 0.0, tableView.bounds.size.width, 116.0))) {
-		headerView.frame = CGRectMake(0.0, 0.0, tableView.bounds.size.width, 116.0);
-		tableView.tableHeaderView = headerView;
-	}
+	[LSUITheme sizeHeaderForTableView:tableView];
 	[self styleVisibleCells];
 }
 

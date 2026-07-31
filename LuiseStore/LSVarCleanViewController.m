@@ -23,9 +23,9 @@
 	self.title = @"varClean";
 	self.clearsSelectionOnViewWillAppear = NO;
 	[LSUITheme styleTableView:self.tableView];
-	self.tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 96.0, 0.0);
-	self.tableView.verticalScrollIndicatorInsets = UIEdgeInsetsMake(0.0, 0.0, 88.0, 0.0);
+	self.tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 12.0, 0.0);
 	self.tableView.tableHeaderView = [self makeHeaderView];
+	[LSUITheme sizeHeaderForTableView:self.tableView];
 	self.tableView.tableFooterView = [UIView new];
 	self.refreshControl = [[UIRefreshControl alloc] init];
 	self.refreshControl.tintColor = LSUITheme.accentColor;
@@ -33,20 +33,26 @@
 
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Select All"
 		style:UIBarButtonItemStylePlain target:self action:@selector(toggleAll)];
-	UIBarButtonItem *cleanButton = [[UIBarButtonItem alloc] initWithTitle:@"Clean"
-		style:UIBarButtonItemStyleDone target:self action:@selector(confirmClean)];
 	UIAction *editRulesAction = [UIAction actionWithTitle:@"Edit Custom Rules"
 		image:[UIImage systemImageNamed:@"doc.text"] identifier:nil handler:^(UIAction *action) {
 			[self openPathInFileViewer:self.customRulesPath];
 		}];
+	UIAction *cleanAction = [UIAction actionWithTitle:@"Clean Selected"
+		image:[UIImage systemImageNamed:@"trash"] identifier:nil handler:^(UIAction *action) {
+			[self confirmClean];
+		}];
+	cleanAction.attributes = UIMenuElementAttributesDestructive;
+	cleanAction.discoverabilityTitle = @"Delete selected files and folders";
 	UIBarButtonItem *rulesButton = [[UIBarButtonItem alloc] initWithImage:
 		[UIImage systemImageNamed:@"ellipsis.circle"] menu:
-		[UIMenu menuWithTitle:@"Settings" children:@[editRulesAction]]];
-	rulesButton.accessibilityLabel = @"varClean settings";
-	self.navigationItem.rightBarButtonItems = @[rulesButton, cleanButton];
+		[UIMenu menuWithTitle:@"varClean" children:@[cleanAction, editRulesAction]]];
+	rulesButton.accessibilityLabel = @"varClean actions";
+	self.navigationItem.rightBarButtonItem = rulesButton;
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshKeepingSelection)
 		name:UIApplicationWillEnterForegroundNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contentSizeCategoryDidChange:)
+		name:UIContentSizeCategoryDidChangeNotification object:nil];
 	[self refreshKeepingSelection:NO];
 }
 
@@ -55,28 +61,55 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)contentSizeCategoryDidChange:(NSNotification *)notification
+{
+	[LSUITheme sizeHeaderForTableView:self.tableView];
+	[self.tableView reloadData];
+}
+
 - (UIView *)makeHeaderView
 {
 	CGFloat width = self.view.bounds.size.width;
-	UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, width, 104.0)];
+	UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, width, 1.0)];
 
-	UIView *accent = [[UIView alloc] initWithFrame:CGRectMake(20.0, 16.0, 30.0, 4.0)];
+	UIView *accent = [[UIView alloc] init];
+	accent.translatesAutoresizingMaskIntoConstraints = NO;
 	accent.backgroundColor = LSUITheme.accentColor;
 	accent.layer.cornerRadius = 2.0;
 	[header addSubview:accent];
 
-	UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 31.0, width - 40.0, 30.0)];
+	UILabel *title = [[UILabel alloc] init];
+	title.translatesAutoresizingMaskIntoConstraints = NO;
 	title.text = @"Filesystem residue";
 	title.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleTitle2]
 		scaledFontForFont:[LSUITheme displayFontWithSize:23.0 weight:UIFontWeightBold]];
 	title.adjustsFontForContentSizeCategory = YES;
+	title.numberOfLines = 0;
 	title.textColor = LSUITheme.primaryTextColor;
 	[header addSubview:title];
 
-	_countLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 66.0, width - 40.0, 22.0)];
-	_countLabel.font = [LSUITheme monoFontWithSize:11.0 weight:UIFontWeightMedium];
+	_countLabel = [[UILabel alloc] init];
+	_countLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_countLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption1]
+		scaledFontForFont:[LSUITheme monoFontWithSize:11.0 weight:UIFontWeightMedium]];
+	_countLabel.adjustsFontForContentSizeCategory = YES;
+	_countLabel.numberOfLines = 0;
 	_countLabel.textColor = LSUITheme.secondaryTextColor;
 	[header addSubview:_countLabel];
+
+	[NSLayoutConstraint activateConstraints:@[
+		[accent.leadingAnchor constraintEqualToAnchor:header.readableContentGuide.leadingAnchor],
+		[accent.topAnchor constraintEqualToAnchor:header.topAnchor constant:16.0],
+		[accent.widthAnchor constraintEqualToConstant:30.0],
+		[accent.heightAnchor constraintEqualToConstant:4.0],
+		[title.leadingAnchor constraintEqualToAnchor:header.readableContentGuide.leadingAnchor],
+		[title.trailingAnchor constraintEqualToAnchor:header.readableContentGuide.trailingAnchor],
+		[title.topAnchor constraintEqualToAnchor:accent.bottomAnchor constant:10.0],
+		[_countLabel.leadingAnchor constraintEqualToAnchor:title.leadingAnchor],
+		[_countLabel.trailingAnchor constraintEqualToAnchor:title.trailingAnchor],
+		[_countLabel.topAnchor constraintEqualToAnchor:title.bottomAnchor constant:5.0],
+		[_countLabel.bottomAnchor constraintEqualToAnchor:header.bottomAnchor constant:-16.0]
+	]];
 	return header;
 }
 
@@ -382,7 +415,12 @@
 		[NSString stringWithFormat:@"%lu CANDIDATE%@  ·  %lu SELECTED",
 			(unsigned long)candidates, candidates == 1 ? @"" : @"S", (unsigned long)selected];
 	self.navigationItem.leftBarButtonItem.enabled = !self.loading && candidates > 0;
-	self.navigationItem.rightBarButtonItem.enabled = !self.loading && selected > 0;
+	self.navigationItem.rightBarButtonItem.enabled = !self.loading;
+	UIBarButtonItem *actionsButton = self.navigationItem.rightBarButtonItem;
+	UIAction *cleanAction = actionsButton.menu.children.firstObject;
+	cleanAction.attributes = selected > 0
+		? UIMenuElementAttributesDestructive
+		: (UIMenuElementAttributesDestructive | UIMenuElementAttributesDisabled);
 	self.emptyStateVisible = candidates == 0 && !self.loading;
 	if (self.emptyStateVisible) {
 		self.tableView.backgroundView = self.emptyLabel;
@@ -495,10 +533,14 @@
 	cell.backgroundColor = LSUITheme.surfaceColor;
 	cell.tintColor = LSUITheme.accentColor;
 	cell.textLabel.text = item[@"name"];
-	cell.textLabel.font = [LSUITheme bodyFontWithSize:15.0 weight:UIFontWeightMedium];
+	cell.textLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:15.0 weight:UIFontWeightMedium]];
+	cell.textLabel.adjustsFontForContentSizeCategory = YES;
 	cell.textLabel.textColor = ignored ? LSUITheme.tertiaryTextColor : LSUITheme.primaryTextColor;
 	cell.detailTextLabel.text = [item[@"isDirectory"] boolValue] ? @"Directory" : @"File";
-	cell.detailTextLabel.font = [LSUITheme monoFontWithSize:10.0 weight:UIFontWeightRegular];
+	cell.detailTextLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption2]
+		scaledFontForFont:[LSUITheme monoFontWithSize:10.0 weight:UIFontWeightRegular]];
+	cell.detailTextLabel.adjustsFontForContentSizeCategory = YES;
 	cell.detailTextLabel.textColor = LSUITheme.secondaryTextColor;
 	cell.imageView.image = [UIImage systemImageNamed:[item[@"isDirectory"] boolValue] ? @"folder.fill" : @"doc.fill"];
 	cell.imageView.tintColor = ignored ? LSUITheme.tertiaryTextColor : LSUITheme.secondaryAccentColor;
@@ -545,7 +587,9 @@
 {
 	UITableViewHeaderFooterView *header = (UITableViewHeaderFooterView *)view;
 	NSDictionary *group = self.groups[section];
-	header.textLabel.font = [LSUITheme monoFontWithSize:10.0 weight:UIFontWeightMedium];
+	header.textLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption2]
+		scaledFontForFont:[LSUITheme monoFontWithSize:10.0 weight:UIFontWeightMedium]];
+	header.textLabel.adjustsFontForContentSizeCategory = YES;
 	header.textLabel.textColor = [group[@"error"] boolValue] ? UIColor.systemRedColor :
 		([group[@"items"] count] ? LSUITheme.secondaryTextColor : LSUITheme.tertiaryTextColor);
 }
@@ -557,7 +601,9 @@
 		_emptyLabel.text = @"No residue found\nYour filesystem looks clean.";
 		_emptyLabel.numberOfLines = 2;
 		_emptyLabel.textAlignment = NSTextAlignmentCenter;
-		_emptyLabel.font = [LSUITheme bodyFontWithSize:16.0 weight:UIFontWeightMedium];
+	_emptyLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:16.0 weight:UIFontWeightMedium]];
+	_emptyLabel.adjustsFontForContentSizeCategory = YES;
 		_emptyLabel.textColor = LSUITheme.secondaryTextColor;
 	}
 	return _emptyLabel;
@@ -566,11 +612,8 @@
 - (void)viewDidLayoutSubviews
 {
 	[super viewDidLayoutSubviews];
-	UIView *header = self.tableView.tableHeaderView;
-	if (header && header.frame.size.width != self.tableView.bounds.size.width) {
-		header.frame = CGRectMake(0.0, 0.0, self.tableView.bounds.size.width, 104.0);
-		self.tableView.tableHeaderView = header;
-	}
+	[LSUITheme sizeHeaderForTableView:self.tableView];
+	_emptyLabel.frame = self.tableView.bounds;
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection

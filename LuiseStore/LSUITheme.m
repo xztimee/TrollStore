@@ -85,23 +85,16 @@
 
 	if (@available(iOS 13.0, *)) {
 		UINavigationBarAppearance *appearance = [[UINavigationBarAppearance alloc] init];
-		[appearance configureWithTransparentBackground];
+		[appearance configureWithDefaultBackground];
 		appearance.backgroundColor = [self.backgroundColor colorWithAlphaComponent:0.82];
-		appearance.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
+		appearance.backgroundEffect = UIAccessibilityIsReduceTransparencyEnabled()
+			? nil : [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
 		appearance.shadowColor = UIColor.clearColor;
-		appearance.largeTitleTextAttributes = @{
-			NSFontAttributeName: [self displayFontWithSize:34.0 weight:UIFontWeightBold],
-			NSForegroundColorAttributeName: self.primaryTextColor
-		};
-		appearance.titleTextAttributes = @{
-			NSFontAttributeName: [self bodyFontWithSize:17.0 weight:UIFontWeightSemibold],
-			NSForegroundColorAttributeName: self.primaryTextColor
-		};
+		appearance.largeTitleTextAttributes = @{NSForegroundColorAttributeName: self.primaryTextColor};
+		appearance.titleTextAttributes = @{NSForegroundColorAttributeName: self.primaryTextColor};
 		navigationController.navigationBar.standardAppearance = appearance;
 		navigationController.navigationBar.scrollEdgeAppearance = appearance;
-		if (@available(iOS 15.0, *)) {
-			navigationController.navigationBar.compactAppearance = appearance;
-		}
+		navigationController.navigationBar.compactAppearance = appearance;
 	}
 }
 
@@ -109,11 +102,30 @@
 {
 	tableView.backgroundColor = self.backgroundColor;
 	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-	tableView.contentInset = UIEdgeInsetsMake(8.0, 0.0, 96.0, 0.0);
-	tableView.verticalScrollIndicatorInsets = UIEdgeInsetsMake(0.0, 0.0, 88.0, 0.0);
+	tableView.contentInset = UIEdgeInsetsMake(8.0, 0.0, 12.0, 0.0);
+	tableView.verticalScrollIndicatorInsets = UIEdgeInsetsZero;
 	if (@available(iOS 11.0, *)) {
 		tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
 	}
+}
+
++ (void)sizeHeaderForTableView:(UITableView *)tableView
+{
+	UIView *header = tableView.tableHeaderView;
+	if (!header) return;
+
+	CGFloat width = CGRectGetWidth(tableView.bounds);
+	if (width <= 0.0) return;
+	header.frame = CGRectMake(0.0, 0.0, width, header.frame.size.height);
+	[header setNeedsLayout];
+	[header layoutIfNeeded];
+	CGFloat height = [header systemLayoutSizeFittingSize:CGSizeMake(width, UILayoutFittingCompressedSize.height)
+		withHorizontalFittingPriority:UILayoutPriorityRequired
+		verticalFittingPriority:UILayoutPriorityFittingSizeLevel].height;
+	if (height <= 0.0 || (fabs(header.frame.size.height - height) < 0.5 &&
+		fabs(header.frame.size.width - width) < 0.5)) return;
+	header.frame = CGRectMake(0.0, 0.0, width, height);
+	tableView.tableHeaderView = header;
 }
 
 + (CAGradientLayer *)auroraLayerForBounds:(CGRect)bounds
