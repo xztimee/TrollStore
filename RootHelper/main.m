@@ -1519,6 +1519,17 @@ void cleanRestrictions(void)
 	killall(@"profiled", NO); // profiled needs to restart for the changes to apply
 }
 
+BOOL isSafeVarCleanPath(NSString* path)
+{
+	NSString* standardizedPath = path.stringByStandardizingPath;
+	if(![standardizedPath hasPrefix:@"/var/"] && ![standardizedPath hasPrefix:@"/private/var/"]) return NO;
+
+	NSString* parentPath = [standardizedPath stringByDeletingLastPathComponent];
+	NSString* resolvedParentPath = [[NSURL fileURLWithPath:parentPath] URLByResolvingSymlinksInPath].path;
+	return [resolvedParentPath isEqualToString:@"/var"] || [resolvedParentPath hasPrefix:@"/var/"] ||
+		[resolvedParentPath isEqualToString:@"/private/var"] || [resolvedParentPath hasPrefix:@"/private/var/"];
+}
+
 int MAIN_NAME(int argc, char *argv[], char *envp[])
 {
 	@autoreleasepool {
@@ -1611,6 +1622,16 @@ int MAIN_NAME(int argc, char *argv[], char *envp[])
 			if([[NSFileManager defaultManager] fileExistsAtPath:luiseStoreMark])
 			{
 				registerPath(appPath, NO, [newRegistration isEqualToString:@"System"]);
+			}
+		}
+		else if([cmd isEqualToString:@"var-clean"])
+		{
+			if(args.count != 2 || !isSafeVarCleanPath(args[1])) return -3;
+			NSError* error = nil;
+			if(![[NSFileManager defaultManager] removeItemAtPath:args[1] error:&error])
+			{
+				fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
+				ret = -1;
 			}
 		}
 		else if ([cmd isEqualToString:@"transfer-apps"])

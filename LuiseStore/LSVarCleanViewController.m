@@ -1,6 +1,7 @@
 #import "LSVarCleanViewController.h"
 #import "LSUITheme.h"
 #import <LSPresentationDelegate.h>
+#import <LSUtil.h>
 
 @interface LSVarCleanViewController ()
 @property (nonatomic, copy) NSArray<NSMutableDictionary *> *groups;
@@ -476,9 +477,12 @@
 				[failures addObject:path];
 				continue;
 			}
-			NSError *error = nil;
-			if (![NSFileManager.defaultManager removeItemAtPath:path error:&error]) {
-				[failures addObject:[NSString stringWithFormat:@"%@ — %@", path, error.localizedDescription]];
+			NSString *error = nil;
+			if (spawnRoot(rootHelperPath(), @[@"var-clean", path], nil, &error) != 0) {
+				[failures addObject:error.length
+					? [NSString stringWithFormat:@"%@ — %@", path,
+						[error stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]]
+					: path];
 			}
 		}
 		dispatch_async(dispatch_get_main_queue(), ^{
