@@ -2,3 +2,7 @@
 	path = ChOma
 	url = https://github.com/opa334/ChOma
 	# Note: This is the original ChOma library, kept for compatibility
+[submodule "varClean"]
+	path = varClean
+	url = https://github.com/m1337v/varClean.git
+	branch = rootless

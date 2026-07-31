@@ -2,7 +2,7 @@
 
 @interface LSPresentationDelegate : NSObject
 @property (class) UIViewController* presentationViewController;
-@property (class) UIAlertController* activityController;
+@property (class) UIViewController* activityController;
 + (void)startActivity:(NSString*)activity withCancelHandler:(void (^)(void))cancelHandler;
 + (void)startActivity:(NSString*)activity;
 + (void)stopActivityWithCompletion:(void (^)(void))completion;

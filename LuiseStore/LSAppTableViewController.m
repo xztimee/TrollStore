@@ -4,6 +4,7 @@
 #import <LSPresentationDelegate.h>
 #import "LSInstallationController.h"
 #import "LSUtil.h"
+#import "LSUITheme.h"
 @import UniformTypeIdentifiers;
 
 #define ICON_FORMAT_IPAD 8
@@ -34,6 +35,165 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 @interface UIImage ()
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)id format:(NSInteger)format scale:(double)scale;
+@end
+
+@interface LSAppCell : UITableViewCell
+@property (nonatomic, readonly) UIImageView *appIconView;
+@property (nonatomic, copy) NSString *representedBundleIdentifier;
+- (void)configureWithAppInfo:(LSAppInfo *)appInfo icon:(UIImage *)icon;
+@end
+
+@implementation LSAppCell {
+	UIView *_cardView;
+	UILabel *_nameLabel;
+	UILabel *_versionLabel;
+	UILabel *_bundleLabel;
+	UILabel *_registrationLabel;
+	UIImageView *_chevronView;
+}
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+	if (!self) return nil;
+
+	self.backgroundColor = UIColor.clearColor;
+	self.selectionStyle = UITableViewCellSelectionStyleNone;
+
+	_cardView = [[UIView alloc] init];
+	_cardView.translatesAutoresizingMaskIntoConstraints = NO;
+	_cardView.backgroundColor = LSUITheme.surfaceColor;
+	_cardView.layer.cornerRadius = 18.0;
+	_cardView.layer.cornerCurve = kCACornerCurveContinuous;
+	_cardView.layer.borderWidth = 0.5;
+	_cardView.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.28].CGColor;
+	[self.contentView addSubview:_cardView];
+
+	_appIconView = [[UIImageView alloc] init];
+	_appIconView.translatesAutoresizingMaskIntoConstraints = NO;
+	_appIconView.contentMode = UIViewContentModeScaleAspectFill;
+	_appIconView.layer.cornerRadius = 14.0;
+	_appIconView.layer.cornerCurve = kCACornerCurveContinuous;
+	_appIconView.layer.borderWidth = 0.5;
+	_appIconView.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.25].CGColor;
+	_appIconView.clipsToBounds = YES;
+	[_cardView addSubview:_appIconView];
+
+	_nameLabel = [[UILabel alloc] init];
+	_nameLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_nameLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleHeadline]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:16.0 weight:UIFontWeightSemibold]];
+	_nameLabel.adjustsFontForContentSizeCategory = YES;
+	_nameLabel.textColor = LSUITheme.primaryTextColor;
+	_nameLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+	[_cardView addSubview:_nameLabel];
+
+	_versionLabel = [[UILabel alloc] init];
+	_versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_versionLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption1]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:12.0 weight:UIFontWeightMedium]];
+	_versionLabel.adjustsFontForContentSizeCategory = YES;
+	_versionLabel.textColor = LSUITheme.secondaryTextColor;
+	[_cardView addSubview:_versionLabel];
+
+	_bundleLabel = [[UILabel alloc] init];
+	_bundleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_bundleLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleCaption2]
+		scaledFontForFont:[LSUITheme monoFontWithSize:11.0 weight:UIFontWeightRegular]];
+	_bundleLabel.adjustsFontForContentSizeCategory = YES;
+	_bundleLabel.textColor = LSUITheme.tertiaryTextColor;
+	_bundleLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
+	[_bundleLabel setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+	[_cardView addSubview:_bundleLabel];
+
+	_registrationLabel = [[UILabel alloc] init];
+	_registrationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_registrationLabel.font = [LSUITheme monoFontWithSize:10.0 weight:UIFontWeightSemibold];
+	_registrationLabel.textAlignment = NSTextAlignmentCenter;
+	_registrationLabel.layer.cornerRadius = 8.0;
+	_registrationLabel.layer.cornerCurve = kCACornerCurveContinuous;
+	_registrationLabel.clipsToBounds = YES;
+	[_cardView addSubview:_registrationLabel];
+
+	_chevronView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"chevron.right"]];
+	_chevronView.translatesAutoresizingMaskIntoConstraints = NO;
+	_chevronView.tintColor = LSUITheme.tertiaryTextColor;
+	_chevronView.contentMode = UIViewContentModeScaleAspectFit;
+	[_cardView addSubview:_chevronView];
+
+	[NSLayoutConstraint activateConstraints:@[
+		[_cardView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor constant:16.0],
+		[_cardView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor constant:-16.0],
+		[_cardView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:5.0],
+		[_cardView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor constant:-5.0],
+		[_appIconView.leadingAnchor constraintEqualToAnchor:_cardView.leadingAnchor constant:14.0],
+		[_appIconView.centerYAnchor constraintEqualToAnchor:_cardView.centerYAnchor],
+		[_appIconView.widthAnchor constraintEqualToConstant:54.0],
+		[_appIconView.heightAnchor constraintEqualToConstant:54.0],
+		[_nameLabel.leadingAnchor constraintEqualToAnchor:_appIconView.trailingAnchor constant:13.0],
+		[_nameLabel.topAnchor constraintEqualToAnchor:_cardView.topAnchor constant:12.0],
+		[_nameLabel.trailingAnchor constraintLessThanOrEqualToAnchor:_registrationLabel.leadingAnchor constant:-8.0],
+		[_registrationLabel.centerYAnchor constraintEqualToAnchor:_nameLabel.centerYAnchor],
+		[_registrationLabel.trailingAnchor constraintEqualToAnchor:_chevronView.leadingAnchor constant:-9.0],
+		[_registrationLabel.widthAnchor constraintGreaterThanOrEqualToConstant:50.0],
+		[_registrationLabel.heightAnchor constraintEqualToConstant:20.0],
+		[_chevronView.trailingAnchor constraintEqualToAnchor:_cardView.trailingAnchor constant:-13.0],
+		[_chevronView.centerYAnchor constraintEqualToAnchor:_cardView.centerYAnchor],
+		[_chevronView.widthAnchor constraintEqualToConstant:7.0],
+		[_versionLabel.leadingAnchor constraintEqualToAnchor:_nameLabel.leadingAnchor],
+		[_versionLabel.topAnchor constraintEqualToAnchor:_nameLabel.bottomAnchor constant:2.0],
+		[_bundleLabel.leadingAnchor constraintEqualToAnchor:_nameLabel.leadingAnchor],
+		[_bundleLabel.topAnchor constraintEqualToAnchor:_versionLabel.bottomAnchor constant:1.0],
+		[_bundleLabel.trailingAnchor constraintEqualToAnchor:_chevronView.leadingAnchor constant:-12.0],
+		[_bundleLabel.bottomAnchor constraintLessThanOrEqualToAnchor:_cardView.bottomAnchor constant:-10.0]
+	]];
+
+	return self;
+}
+
+- (void)configureWithAppInfo:(LSAppInfo *)appInfo icon:(UIImage *)icon
+{
+	NSString *appName = appInfo.displayName ?: @"Unknown App";
+	NSString *version = appInfo.versionString ?: @"Unknown version";
+	NSString *bundleIdentifier = appInfo.bundleIdentifier ?: @"Bundle ID unavailable";
+	NSString *registration = appInfo.registrationState ?: @"Unknown";
+
+	_nameLabel.text = appName;
+	_versionLabel.text = [NSString stringWithFormat:@"Version %@", version];
+	_bundleLabel.text = bundleIdentifier;
+	_registrationLabel.text = [NSString stringWithFormat:@" %@ ", registration.uppercaseString];
+	_appIconView.image = icon;
+	self.representedBundleIdentifier = appInfo.bundleIdentifier;
+
+	BOOL isSystem = [registration isEqualToString:@"System"];
+	UIColor *statusColor = isSystem ? UIColor.systemGreenColor : UIColor.systemOrangeColor;
+	_registrationLabel.textColor = statusColor;
+	_registrationLabel.backgroundColor = [statusColor colorWithAlphaComponent:0.13];
+
+	self.isAccessibilityElement = YES;
+	self.accessibilityTraits = UIAccessibilityTraitButton;
+	self.accessibilityLabel = appName;
+	self.accessibilityValue = [NSString stringWithFormat:@"Version %@, %@, %@ registration", version, bundleIdentifier, registration];
+	self.accessibilityHint = @"Shows app actions";
+}
+
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
+{
+	[super setHighlighted:highlighted animated:animated];
+	[UIView animateWithDuration:animated ? 0.15 : 0.0 animations:^{
+		self->_cardView.transform = highlighted ? CGAffineTransformMakeScale(0.98, 0.98) : CGAffineTransformIdentity;
+		self->_cardView.alpha = highlighted ? 0.78 : 1.0;
+	}];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+	[super traitCollectionDidChange:previousTraitCollection];
+	_cardView.backgroundColor = LSUITheme.surfaceColor;
+	_cardView.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.28].CGColor;
+	_appIconView.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.25].CGColor;
+}
+
 @end
 
 @implementation LSAppTableViewController
@@ -95,6 +255,7 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	dispatch_async(dispatch_get_main_queue(), ^
 	{
 		[self.tableView reloadData];
+		[self updateLibraryState];
 	});
 }
 
@@ -110,9 +271,121 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	
 	self.tableView.allowsMultipleSelectionDuringEditing = NO;
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+	self.tableView.rowHeight = UITableViewAutomaticDimension;
+	self.tableView.estimatedRowHeight = 78.0;
+	[LSUITheme styleTableView:self.tableView];
+	[self.tableView registerClass:LSAppCell.class forCellReuseIdentifier:@"ApplicationCell"];
 
 	[self _setUpNavigationBar];
 	[self _setUpSearchBar];
+	[self _setUpLibraryHeader];
+	[self _setUpEmptyState];
+	[self updateLibraryState];
+}
+
+- (void)_setUpLibraryHeader
+{
+	_libraryHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, 68.0)];
+	_libraryHeaderView.backgroundColor = UIColor.clearColor;
+
+	UILabel *eyebrowLabel = [[UILabel alloc] init];
+	eyebrowLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	eyebrowLabel.text = @"PERMASIGNED LIBRARY";
+	eyebrowLabel.font = [LSUITheme monoFontWithSize:11.0 weight:UIFontWeightSemibold];
+	eyebrowLabel.textColor = LSUITheme.accentColor;
+	eyebrowLabel.accessibilityElementsHidden = YES;
+	[_libraryHeaderView addSubview:eyebrowLabel];
+
+	_libraryCountLabel = [[UILabel alloc] init];
+	_libraryCountLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_libraryCountLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleSubheadline]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:14.0 weight:UIFontWeightRegular]];
+	_libraryCountLabel.adjustsFontForContentSizeCategory = YES;
+	_libraryCountLabel.textColor = LSUITheme.secondaryTextColor;
+	[_libraryHeaderView addSubview:_libraryCountLabel];
+
+	UIView *auroraLine = [[UIView alloc] init];
+	auroraLine.translatesAutoresizingMaskIntoConstraints = NO;
+	auroraLine.backgroundColor = LSUITheme.accentColor;
+	auroraLine.layer.cornerRadius = 1.5;
+	[_libraryHeaderView addSubview:auroraLine];
+
+	[NSLayoutConstraint activateConstraints:@[
+		[auroraLine.leadingAnchor constraintEqualToAnchor:_libraryHeaderView.leadingAnchor constant:16.0],
+		[auroraLine.topAnchor constraintEqualToAnchor:_libraryHeaderView.topAnchor constant:12.0],
+		[auroraLine.widthAnchor constraintEqualToConstant:28.0],
+		[auroraLine.heightAnchor constraintEqualToConstant:3.0],
+		[eyebrowLabel.leadingAnchor constraintEqualToAnchor:auroraLine.leadingAnchor],
+		[eyebrowLabel.topAnchor constraintEqualToAnchor:auroraLine.bottomAnchor constant:8.0],
+		[_libraryCountLabel.leadingAnchor constraintEqualToAnchor:eyebrowLabel.leadingAnchor],
+		[_libraryCountLabel.topAnchor constraintEqualToAnchor:eyebrowLabel.bottomAnchor constant:3.0]
+	]];
+
+	self.tableView.tableHeaderView = _libraryHeaderView;
+}
+
+- (void)_setUpEmptyState
+{
+	_emptyStateView = [[UIView alloc] initWithFrame:self.tableView.bounds];
+	_emptyStateView.backgroundColor = UIColor.clearColor;
+
+	UIImageView *symbolView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"square.stack.3d.up.slash"]];
+	symbolView.translatesAutoresizingMaskIntoConstraints = NO;
+	symbolView.tintColor = [LSUITheme.accentColor colorWithAlphaComponent:0.72];
+	symbolView.preferredSymbolConfiguration = [UIImageSymbolConfiguration configurationWithPointSize:44.0 weight:UIImageSymbolWeightLight];
+	[_emptyStateView addSubview:symbolView];
+
+	_emptyTitleLabel = [[UILabel alloc] init];
+	_emptyTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_emptyTitleLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleTitle2]
+		scaledFontForFont:[LSUITheme displayFontWithSize:22.0 weight:UIFontWeightBold]];
+	_emptyTitleLabel.adjustsFontForContentSizeCategory = YES;
+	_emptyTitleLabel.textColor = LSUITheme.primaryTextColor;
+	_emptyTitleLabel.textAlignment = NSTextAlignmentCenter;
+	[_emptyStateView addSubview:_emptyTitleLabel];
+
+	_emptyMessageLabel = [[UILabel alloc] init];
+	_emptyMessageLabel.translatesAutoresizingMaskIntoConstraints = NO;
+	_emptyMessageLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody]
+		scaledFontForFont:[LSUITheme bodyFontWithSize:15.0 weight:UIFontWeightRegular]];
+	_emptyMessageLabel.adjustsFontForContentSizeCategory = YES;
+	_emptyMessageLabel.textColor = LSUITheme.secondaryTextColor;
+	_emptyMessageLabel.textAlignment = NSTextAlignmentCenter;
+	_emptyMessageLabel.numberOfLines = 0;
+	[_emptyStateView addSubview:_emptyMessageLabel];
+
+	[NSLayoutConstraint activateConstraints:@[
+		[symbolView.centerXAnchor constraintEqualToAnchor:_emptyStateView.centerXAnchor],
+		[symbolView.centerYAnchor constraintEqualToAnchor:_emptyStateView.centerYAnchor constant:-55.0],
+		[symbolView.widthAnchor constraintEqualToConstant:56.0],
+		[symbolView.heightAnchor constraintEqualToConstant:56.0],
+		[_emptyTitleLabel.topAnchor constraintEqualToAnchor:symbolView.bottomAnchor constant:18.0],
+		[_emptyTitleLabel.leadingAnchor constraintEqualToAnchor:_emptyStateView.leadingAnchor constant:30.0],
+		[_emptyTitleLabel.trailingAnchor constraintEqualToAnchor:_emptyStateView.trailingAnchor constant:-30.0],
+		[_emptyMessageLabel.topAnchor constraintEqualToAnchor:_emptyTitleLabel.bottomAnchor constant:8.0],
+		[_emptyMessageLabel.leadingAnchor constraintEqualToAnchor:_emptyStateView.leadingAnchor constant:36.0],
+		[_emptyMessageLabel.trailingAnchor constraintEqualToAnchor:_emptyStateView.trailingAnchor constant:-36.0]
+	]];
+}
+
+- (void)updateLibraryState
+{
+	BOOL isSearching = _searchKey.length > 0;
+	NSUInteger count = _cachedAppInfos.count;
+	if (!_libraryCountLabel || !_emptyTitleLabel || !_emptyMessageLabel) return;
+	_libraryCountLabel.text = isSearching
+		? [NSString stringWithFormat:@"%lu match%@", (unsigned long)count, count == 1 ? @"" : @"es"]
+		: [NSString stringWithFormat:@"%lu installed app%@", (unsigned long)count, count == 1 ? @"" : @"s"];
+
+	if (count == 0) {
+		_emptyTitleLabel.text = isSearching ? @"No matches" : @"Your library is empty";
+		_emptyMessageLabel.text = isSearching
+			? @"Try another app name."
+			: @"Use the plus button to install an IPA file or add one from a URL.";
+		self.tableView.backgroundView = _emptyStateView;
+	} else {
+		self.tableView.backgroundView = nil;
+	}
 }
 
 - (void)_setUpNavigationBar
@@ -170,8 +443,11 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	_searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
 	_searchController.searchResultsUpdater = self;
 	_searchController.obscuresBackgroundDuringPresentation = NO;
+	_searchController.searchBar.placeholder = @"Search apps";
+	_searchController.searchBar.tintColor = LSUITheme.accentColor;
 	self.navigationItem.searchController = _searchController;
 	self.navigationItem.hidesSearchBarWhenScrolling = YES;
+	self.definesPresentationContext = YES;
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController
@@ -358,47 +634,37 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ApplicationCell"];
-	if(!cell) {
-		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ApplicationCell"];
-	}
+	LSAppCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ApplicationCell" forIndexPath:indexPath];
 
 	if(!indexPath || indexPath.row > (_cachedAppInfos.count - 1)) return cell;
 
 	LSAppInfo* appInfo = _cachedAppInfos[indexPath.row];
 	NSString* appId = [appInfo bundleIdentifier];
-	NSString* appVersion = [appInfo versionString];
-
-	// Configure the cell...
-	cell.textLabel.text = [appInfo displayName];
-	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ • %@", appVersion, appId];
-	cell.imageView.layer.borderWidth = 1;
-	cell.imageView.layer.borderColor = [UIColor.labelColor colorWithAlphaComponent:0.1].CGColor;
-	cell.imageView.layer.cornerRadius = 13.5;
-	cell.imageView.layer.masksToBounds = YES;
-	cell.imageView.layer.cornerCurve = kCACornerCurveContinuous;
 
 	if(appId)
 	{
 		UIImage* cachedIcon = _cachedIcons[appId];
 		if(cachedIcon)
 		{
-			cell.imageView.image = cachedIcon;
+			[cell configureWithAppInfo:appInfo icon:cachedIcon];
 		}
 		else
 		{
-			cell.imageView.image = _placeholderIcon;
+			[cell configureWithAppInfo:appInfo icon:_placeholderIcon];
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
 			{
 				UIImage* iconImage = imageWithSize([UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale], _placeholderIcon.size);
-				_cachedIcons[appId] = iconImage;
+				if (!iconImage) iconImage = self->_placeholderIcon;
+				self->_cachedIcons[appId] = iconImage;
 				dispatch_async(dispatch_get_main_queue(), ^{
-					NSIndexPath *curIndexPath = [NSIndexPath indexPathForRow:[_cachedAppInfos indexOfObject:appInfo] inSection:0];
+					NSUInteger currentIndex = [self->_cachedAppInfos indexOfObject:appInfo];
+					if (currentIndex == NSNotFound) return;
+					NSIndexPath *curIndexPath = [NSIndexPath indexPathForRow:currentIndex inSection:0];
 					UITableViewCell *curCell = [tableView cellForRowAtIndexPath:curIndexPath];
-					if(curCell)
+					if([curCell isKindOfClass:LSAppCell.class] &&
+						[((LSAppCell *)curCell).representedBundleIdentifier isEqualToString:appId])
 					{
-						curCell.imageView.image = iconImage;
-						[curCell setNeedsLayout];
+						[(LSAppCell *)curCell configureWithAppInfo:appInfo icon:iconImage];
 					}
 				});
 			});
@@ -406,19 +672,17 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	}
 	else
 	{
-		cell.imageView.image = _placeholderIcon;
+		[cell configureWithAppInfo:appInfo icon:_placeholderIcon];
 	}
 
-	cell.preservesSuperviewLayoutMargins = NO;
 	cell.separatorInset = UIEdgeInsetsZero;
-	cell.layoutMargins = UIEdgeInsetsZero;
 
 	return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	return 80.0f;
+	return UITableViewAutomaticDimension;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath

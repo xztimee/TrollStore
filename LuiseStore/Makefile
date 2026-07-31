@@ -9,6 +9,7 @@ include $(THEOS)/makefiles/common.mk
 APPLICATION_NAME = LuiseStore
 
 LuiseStore_FILES = $(wildcard *.m) $(wildcard ../Shared/*.m)
+LuiseStore_RESOURCE_FILES = ../varClean/varClean/VarCleanRules.json ../varClean/varClean/varCleanRules_rootful_overrides.json
 LuiseStore_FRAMEWORKS = UIKit CoreGraphics CoreServices CoreTelephony
 LuiseStore_PRIVATE_FRAMEWORKS = Preferences MobileIcons MobileContainerManager
 LuiseStore_LIBRARIES = archive

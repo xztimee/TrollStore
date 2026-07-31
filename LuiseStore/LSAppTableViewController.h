@@ -9,6 +9,11 @@
     NSMutableDictionary* _cachedIcons;
     UISearchController* _searchController;
 	NSString* _searchKey;
+	UIView* _libraryHeaderView;
+	UILabel* _libraryCountLabel;
+	UIView* _emptyStateView;
+	UILabel* _emptyTitleLabel;
+	UILabel* _emptyMessageLabel;
 }
 
 @end

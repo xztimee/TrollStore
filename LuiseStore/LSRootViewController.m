@@ -1,10 +1,13 @@
 #import "LSRootViewController.h"
 #import "LSAppTableViewController.h"
+#import "LSVarCleanViewController.h"
 #import "LSSettingsListController.h"
+#import "LSUITheme.h"
 #import <LSPresentationDelegate.h>
 
 @implementation LSRootViewController {
 	UIView *_glassBackground;
+	CAGradientLayer *_auroraLayer;
 }
 
 - (void)loadView {
@@ -13,17 +16,28 @@
 	LSAppTableViewController* appTableVC = [[LSAppTableViewController alloc] init];
 	appTableVC.title = @"Apps";
 
+	LSVarCleanViewController* varCleanVC = [[LSVarCleanViewController alloc] init];
+	varCleanVC.title = @"varClean";
+
 	LSSettingsListController* settingsListVC = [[LSSettingsListController alloc] init];
 	settingsListVC.title = @"Settings";
 
 	UINavigationController* appNavigationController = [[UINavigationController alloc] initWithRootViewController:appTableVC];
+	UINavigationController* varCleanNavigationController = [[UINavigationController alloc] initWithRootViewController:varCleanVC];
 	UINavigationController* settingsNavigationController = [[UINavigationController alloc] initWithRootViewController:settingsListVC];
-	
-	appNavigationController.tabBarItem.image = [UIImage systemImageNamed:@"square.stack.3d.up.fill"];
-	settingsNavigationController.tabBarItem.image = [UIImage systemImageNamed:@"gear"];
+	[LSUITheme applyNavigationAppearance:appNavigationController];
+	[LSUITheme applyNavigationAppearance:varCleanNavigationController];
+	[LSUITheme applyNavigationAppearance:settingsNavigationController];
 
-	self.title = @"Root View Controller";
-	self.viewControllers = @[appNavigationController, settingsNavigationController];
+	appNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Apps"
+		image:[UIImage systemImageNamed:@"square.grid.2x2"] selectedImage:[UIImage systemImageNamed:@"square.grid.2x2.fill"]];
+	varCleanNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"varClean"
+		image:[UIImage systemImageNamed:@"sparkles"] selectedImage:nil];
+	settingsNavigationController.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings"
+		image:[UIImage systemImageNamed:@"slider.horizontal.3"] selectedImage:nil];
+
+	self.title = @"LuiseStore";
+	self.viewControllers = @[appNavigationController, varCleanNavigationController, settingsNavigationController];
 }
 
 - (void)viewDidLoad
@@ -35,43 +49,54 @@
 }
 
 - (void)setupGlassmorphismTabBar {
-	// Make default tab bar background fully transparent
 	if (@available(iOS 13.0, *)) {
 		UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
 		[appearance configureWithTransparentBackground];
-		appearance.stackedLayoutAppearance.normal.iconColor = [UIColor colorWithWhite:1.0 alpha:0.45];
-		appearance.stackedLayoutAppearance.selected.iconColor = [UIColor whiteColor];
-		appearance.stackedLayoutAppearance.normal.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithWhite:1.0 alpha:0.45]};
-		appearance.stackedLayoutAppearance.selected.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
+		appearance.shadowColor = UIColor.clearColor;
+		appearance.stackedLayoutAppearance.normal.iconColor = LSUITheme.secondaryTextColor;
+		appearance.stackedLayoutAppearance.selected.iconColor = LSUITheme.accentColor;
+		appearance.stackedLayoutAppearance.normal.titleTextAttributes = @{
+			NSForegroundColorAttributeName: LSUITheme.secondaryTextColor,
+			NSFontAttributeName: [LSUITheme bodyFontWithSize:10.0 weight:UIFontWeightMedium]
+		};
+		appearance.stackedLayoutAppearance.selected.titleTextAttributes = @{
+			NSForegroundColorAttributeName: LSUITheme.accentColor,
+			NSFontAttributeName: [LSUITheme bodyFontWithSize:10.0 weight:UIFontWeightSemibold]
+		};
 		self.tabBar.standardAppearance = appearance;
 		if (@available(iOS 15.0, *)) {
 			self.tabBar.scrollEdgeAppearance = appearance;
 		}
 	}
 
-	self.tabBar.tintColor = [UIColor whiteColor];
+	self.tabBar.tintColor = LSUITheme.accentColor;
+	self.tabBar.unselectedItemTintColor = LSUITheme.secondaryTextColor;
+	self.tabBar.backgroundImage = [UIImage new];
+	self.tabBar.shadowImage = [UIImage new];
 	self.tabBar.clipsToBounds = NO;
 
-	// Glass container with rounded corners
 	_glassBackground = [[UIView alloc] init];
-	_glassBackground.layer.cornerRadius = 22;
+	_glassBackground.userInteractionEnabled = NO;
+	_glassBackground.accessibilityElementsHidden = YES;
+	_glassBackground.layer.cornerRadius = 25.0;
+	_glassBackground.layer.cornerCurve = kCACornerCurveContinuous;
 	_glassBackground.clipsToBounds = YES;
 
-	// Blur effect for glassmorphism
-	UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterialDark];
-	UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
+	UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:
+		UIAccessibilityIsReduceTransparencyEnabled() ? nil :
+		[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]];
 	blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	[_glassBackground addSubview:blurView];
 
-	// Subtle border for the glass edge
 	_glassBackground.layer.borderWidth = 0.5;
-	_glassBackground.layer.borderColor = [UIColor colorWithWhite:1.0 alpha:0.18].CGColor;
+	_glassBackground.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.35].CGColor;
+	_auroraLayer = [LSUITheme auroraLayerForBounds:CGRectZero];
+	[blurView.contentView.layer addSublayer:_auroraLayer];
 
-	// Shadow for depth
 	self.tabBar.layer.shadowColor = [UIColor blackColor].CGColor;
-	self.tabBar.layer.shadowOffset = CGSizeMake(0, 4);
-	self.tabBar.layer.shadowRadius = 12;
-	self.tabBar.layer.shadowOpacity = 0.3;
+	self.tabBar.layer.shadowOffset = CGSizeMake(0, 8);
+	self.tabBar.layer.shadowRadius = 18;
+	self.tabBar.layer.shadowOpacity = 0.16;
 
 	[self.tabBar insertSubview:_glassBackground atIndex:0];
 }
@@ -79,21 +104,37 @@
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
 
-	CGFloat floatMargin = 20;
-	CGFloat sideMargin = 16;
+	CGFloat floatMargin = 14.0;
+	CGFloat sideMargin = 16.0;
 	CGFloat safeBottom = self.view.safeAreaInsets.bottom;
-	CGFloat tabBarHeight = 50;
+	CGFloat tabBarHeight = 58.0;
+	CGFloat availableWidth = self.view.bounds.size.width - (sideMargin * 2.0);
+	CGFloat tabBarWidth = MIN(availableWidth, 420.0);
 
-	// Reposition the tab bar to float above the bottom
 	CGRect tabFrame = self.tabBar.frame;
+	tabFrame.size.width = tabBarWidth;
 	tabFrame.size.height = tabBarHeight;
-	tabFrame.origin.y = self.view.frame.size.height - tabBarHeight - floatMargin - safeBottom;
+	tabFrame.origin.x = floor((self.view.bounds.size.width - tabBarWidth) / 2.0);
+	tabFrame.origin.y = self.view.bounds.size.height - tabBarHeight - floatMargin - safeBottom;
 	self.tabBar.frame = tabFrame;
 
-	// Position glass background with side margins, filling the entire tab bar
-	_glassBackground.frame = CGRectMake(sideMargin, 0, tabFrame.size.width - sideMargin * 2, tabBarHeight);
+	_glassBackground.frame = self.tabBar.bounds;
 	UIVisualEffectView *blurView = _glassBackground.subviews.firstObject;
 	blurView.frame = _glassBackground.bounds;
+	_glassBackground.backgroundColor = LSUITheme.surfaceColor;
+	_auroraLayer.frame = blurView.bounds;
+	self.tabBar.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.tabBar.bounds cornerRadius:25.0].CGPath;
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+	[super traitCollectionDidChange:previousTraitCollection];
+	_glassBackground.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.35].CGColor;
+	_glassBackground.backgroundColor = LSUITheme.surfaceColor;
+	[_auroraLayer removeFromSuperlayer];
+	_auroraLayer = [LSUITheme auroraLayerForBounds:_glassBackground.bounds];
+	UIVisualEffectView *blurView = _glassBackground.subviews.firstObject;
+	[blurView.contentView.layer addSublayer:_auroraLayer];
 }
 
 @end

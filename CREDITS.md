@@ -31,6 +31,13 @@ All credits for the original work and the CoreTrust bug exploitation go to:
 - [Write-Up on the first CoreTrust bug](https://worthdoingbadly.com/coretrust/)
 - [Original TrollStore Repository](https://github.com/opa334/TrollStore)
 
+## varClean
+
+The integrated filesystem cleanup feature is based on
+[varClean](https://github.com/m1337v/varClean), a TrollStore port of RootHide
+Manager's cleanup function. Copyright © 2023 RootHide, used under the MIT
+License.
+
 ## LuiseStore Modifications
 
 LuiseStore maintains the same functionality as TrollStore while being rebranded for specific use cases.

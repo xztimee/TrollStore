@@ -6,6 +6,7 @@
 #import "LSInstallationController.h"
 #import "LSSettingsAdvancedListController.h"
 #import "LSDonateListController.h"
+#import "LSUITheme.h"
 
 @interface NSUserDefaults (Private)
 - (instancetype)_initWithSuiteName:(NSString *)suiteName container:(NSURL *)container;
@@ -14,9 +15,33 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 
 @implementation LSSettingsListController
 
+- (UITableView *)ls_tableView
+{
+	NSMutableArray<UIView *> *pendingViews = [NSMutableArray arrayWithObject:self.view];
+	while (pendingViews.count > 0) {
+		UIView *view = pendingViews.lastObject;
+		[pendingViews removeLastObject];
+		if ([view isKindOfClass:UITableView.class]) {
+			return (UITableView *)view;
+		}
+		[pendingViews addObjectsFromArray:view.subviews];
+	}
+	return nil;
+}
+
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+	self.title = @"Settings";
+	UITableView *tableView = [self ls_tableView];
+	if (tableView) {
+		[LSUITheme styleTableView:tableView];
+		tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 96.0, 0.0);
+		tableView.verticalScrollIndicatorInsets = UIEdgeInsetsMake(0.0, 0.0, 88.0, 0.0);
+		tableView.backgroundView = [self settingsBackgroundView];
+		tableView.tableHeaderView = [self settingsHeaderView];
+		[self styleVisibleCells];
+	}
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:UIApplicationWillEnterForegroundNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:@"LuiseStoreReloadSettingsNotification" object:nil];
 
@@ -67,6 +92,127 @@ extern NSUserDefaults* luiseStoreUserDefaults(void);
 	}
 #endif
 	[self reloadSpecifiers];
+}
+
+- (UIView *)settingsBackgroundView
+{
+	UIView *backgroundView = [[UIView alloc] init];
+	backgroundView.backgroundColor = LSUITheme.backgroundColor;
+	CAGradientLayer *aurora = [LSUITheme auroraLayerForBounds:CGRectZero];
+	[backgroundView.layer addSublayer:aurora];
+	aurora.name = @"LuiseAurora";
+	return backgroundView;
+}
+
+- (UIView *)settingsHeaderView
+{
+	CGFloat width = self.view.bounds.size.width;
+	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, width, 116.0)];
+	headerView.backgroundColor = UIColor.clearColor;
+
+	UIView *accentMark = [[UIView alloc] initWithFrame:CGRectMake(20.0, 18.0, 30.0, 4.0)];
+	accentMark.backgroundColor = LSUITheme.accentColor;
+	accentMark.layer.cornerRadius = 2.0;
+	[headerView addSubview:accentMark];
+
+	UILabel *brandLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 32.0, width - 40.0, 32.0)];
+	brandLabel.text = @"LuiseStore";
+	brandLabel.font = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleTitle1]
+		scaledFontForFont:[LSUITheme displayFontWithSize:28.0 weight:UIFontWeightBold]];
+	brandLabel.adjustsFontForContentSizeCategory = YES;
+	brandLabel.textColor = LSUITheme.primaryTextColor;
+	[headerView addSubview:brandLabel];
+
+	NSString *version = [self getLuiseStoreVersion] ?: @"Unknown";
+	UILabel *versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 70.0, width - 40.0, 22.0)];
+	versionLabel.text = [NSString stringWithFormat:@"CoreTrust utility  ·  v%@", version];
+	versionLabel.font = [LSUITheme monoFontWithSize:11.0 weight:UIFontWeightMedium];
+	versionLabel.textColor = LSUITheme.secondaryTextColor;
+	[headerView addSubview:versionLabel];
+
+	return headerView;
+}
+
+- (void)styleVisibleCells
+{
+	UITableView *tableView = [self ls_tableView];
+	if (!tableView) return;
+	tableView.backgroundColor = LSUITheme.backgroundColor;
+	CALayer *aurora = nil;
+	for (CALayer *layer in tableView.backgroundView.layer.sublayers) {
+		if ([layer.name isEqualToString:@"LuiseAurora"]) {
+			aurora = layer;
+			break;
+		}
+	}
+	aurora.frame = tableView.backgroundView.bounds;
+
+	for (UITableViewCell *cell in tableView.visibleCells) {
+		[self styleCell:cell];
+	}
+}
+
+- (void)styleCell:(UITableViewCell *)cell
+{
+	cell.backgroundColor = UIColor.clearColor;
+	cell.tintColor = LSUITheme.accentColor;
+	cell.textLabel.font = [LSUITheme bodyFontWithSize:16.0 weight:UIFontWeightRegular];
+	cell.textLabel.textColor = LSUITheme.primaryTextColor;
+	cell.detailTextLabel.font = [LSUITheme bodyFontWithSize:13.0 weight:UIFontWeightRegular];
+	cell.detailTextLabel.textColor = LSUITheme.secondaryTextColor;
+	cell.textLabel.adjustsFontForContentSizeCategory = YES;
+	cell.detailTextLabel.adjustsFontForContentSizeCategory = YES;
+	cell.accessoryView.tintColor = LSUITheme.accentColor;
+
+	UIView *background = cell.backgroundView;
+	UIView *card = [background viewWithTag:2001];
+	if (!card) {
+		background = [[UIView alloc] init];
+		card = [[UIView alloc] init];
+		card.tag = 2001;
+		card.translatesAutoresizingMaskIntoConstraints = NO;
+		[background addSubview:card];
+		[NSLayoutConstraint activateConstraints:@[
+			[card.leadingAnchor constraintEqualToAnchor:background.leadingAnchor constant:16.0],
+			[card.trailingAnchor constraintEqualToAnchor:background.trailingAnchor constant:-16.0],
+			[card.topAnchor constraintEqualToAnchor:background.topAnchor constant:2.0],
+			[card.bottomAnchor constraintEqualToAnchor:background.bottomAnchor constant:-2.0]
+		]];
+		cell.backgroundView = background;
+	}
+	card.backgroundColor = LSUITheme.surfaceColor;
+	card.layer.cornerRadius = 14.0;
+	card.layer.cornerCurve = kCACornerCurveContinuous;
+	card.layer.borderWidth = 0.5;
+	card.layer.borderColor = [UIColor.separatorColor colorWithAlphaComponent:0.22].CGColor;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	[self styleCell:cell];
+}
+
+- (void)viewDidLayoutSubviews
+{
+	[super viewDidLayoutSubviews];
+	UITableView *tableView = [self ls_tableView];
+	if (!tableView) return;
+	UIView *headerView = tableView.tableHeaderView;
+	if (headerView && !CGRectEqualToRect(headerView.frame, CGRectMake(0.0, 0.0, tableView.bounds.size.width, 116.0))) {
+		headerView.frame = CGRectMake(0.0, 0.0, tableView.bounds.size.width, 116.0);
+		tableView.tableHeaderView = headerView;
+	}
+	[self styleVisibleCells];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+	[super traitCollectionDidChange:previousTraitCollection];
+	UITableView *tableView = [self ls_tableView];
+	if (!tableView) return;
+	tableView.backgroundColor = LSUITheme.backgroundColor;
+	tableView.backgroundView.backgroundColor = LSUITheme.backgroundColor;
+	[self styleVisibleCells];
 }
 
 - (NSMutableArray*)specifiers
