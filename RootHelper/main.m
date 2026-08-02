@@ -514,16 +514,27 @@ int signAdhoc(NSString *filePath, NSDictionary *entitlements)
 
 		NSString *entitlementsPath = nil;
 		NSString *signArg = @"-s";
-		NSString* errorOutput;
+		NSString* errorOutput = nil;
 		if(entitlements)
 		{
-			NSData *entitlementsXML = [NSPropertyListSerialization dataWithPropertyList:entitlements format:NSPropertyListXMLFormat_v1_0 options:0 error:nil];
-			if (entitlementsXML) {
-				entitlementsPath = [[NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"plist"];
-				[entitlementsXML writeToFile:entitlementsPath atomically:NO];
-				signArg = [@"-S" stringByAppendingString:entitlementsPath];
+			NSError *error = nil;
+			NSData *entitlementsXML = [NSPropertyListSerialization dataWithPropertyList:entitlements format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
+			if (!entitlementsXML) {
+				NSLog(@"Failed to serialize entitlements: %@", error);
+				return 175;
 			}
-			
+#ifdef LUISESTORE_LITE
+			// Keep the plist in ldid's visible namespace beside the target binary.
+			NSString *temporaryDirectory = [filePath stringByDeletingLastPathComponent];
+#else
+			NSString *temporaryDirectory = NSTemporaryDirectory();
+#endif
+			entitlementsPath = [[temporaryDirectory stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"plist"];
+			if (![entitlementsXML writeToFile:entitlementsPath options:0 error:&error]) {
+				NSLog(@"Failed to write entitlements to %@: %@", entitlementsPath, error);
+				return 175;
+			}
+			signArg = [@"-S" stringByAppendingString:entitlementsPath];
 		}
 		int ldidRet = runLdid(@[signArg, filePath], nil, &errorOutput);
 		if (entitlementsPath) {
