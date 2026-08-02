@@ -297,19 +297,6 @@ int runLdid(NSArray* args, NSString** output, NSString** errorOutput)
 {
 	NSString* ldidPath = getLdidPath();
 	NSMutableArray* argsM = args.mutableCopy ?: [NSMutableArray new];
-#ifdef LUISESTORE_LITE
-	for(NSUInteger i = 0; i < argsM.count; i++)
-	{
-		NSString* argument = argsM[i];
-		NSString* prefix = [argument hasPrefix:@"-S/"] ? @"-S" : @"";
-		NSString* path = prefix.length ? [argument substringFromIndex:prefix.length] : argument;
-		if([path hasPrefix:@"/"])
-		{
-			NSString* convertedPath = ROOTFS_PATH_NSSTRING(path);
-			if(convertedPath) argsM[i] = [prefix stringByAppendingString:convertedPath];
-		}
-	}
-#endif
 	[argsM insertObject:ldidPath.lastPathComponent atIndex:0];
 
 	NSUInteger argCount = [argsM count];
@@ -336,7 +323,7 @@ int runLdid(NSArray* args, NSString** output, NSString** errorOutput)
 	
 	pid_t task_pid;
 	int status = -200;
-	NSLog(@"About to spawn ldid (%@) with args %@", ldidPath, [argsM subarrayWithRange:NSMakeRange(1, argsM.count - 1)]);
+	NSLog(@"About to spawn ldid (%@) with args %@", ldidPath, args);
 	int spawnError = posix_spawn(&task_pid, [ldidPath fileSystemRepresentation], &action, NULL, (char* const*)argsC, NULL);
 	for (NSUInteger i = 0; i < argCount; i++)
 	{
@@ -527,22 +514,25 @@ int signAdhoc(NSString *filePath, NSDictionary *entitlements)
 
 		NSString *entitlementsPath = nil;
 		NSString *signArg = @"-s";
-		NSString* errorOutput = nil;
+		NSString* errorOutput;
 		if(entitlements)
 		{
-			NSError *error = nil;
-			NSData *entitlementsXML = [NSPropertyListSerialization dataWithPropertyList:entitlements format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
-			if (!entitlementsXML) {
-				NSLog(@"Failed to serialize entitlements: %@", error);
-				return 175;
+			NSData *entitlementsXML = [NSPropertyListSerialization dataWithPropertyList:entitlements format:NSPropertyListXMLFormat_v1_0 options:0 error:nil];
+			if (entitlementsXML) {
+				// Write next to the binary being signed: NSTemporaryDirectory() may
+				// resolve to /var/tmp which can be missing or unwritable on rootless
+				NSString *targetDir = [filePath stringByDeletingLastPathComponent];
+				entitlementsPath = [[targetDir stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"plist"];
+				if (![entitlementsXML writeToFile:entitlementsPath atomically:YES]) {
+					NSLog(@"[signAdhoc] failed to write entitlements plist to %@, falling back to NSTemporaryDirectory", entitlementsPath);
+					entitlementsPath = [[NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"plist"];
+					if (![entitlementsXML writeToFile:entitlementsPath atomically:YES]) {
+						NSLog(@"[signAdhoc] failed to write entitlements plist to %@, aborting", entitlementsPath);
+						return 175;
+					}
+				}
+				signArg = [@"-S" stringByAppendingString:entitlementsPath];
 			}
-			NSString *temporaryDirectory = NSTemporaryDirectory();
-			entitlementsPath = [[temporaryDirectory stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"plist"];
-			if (![entitlementsXML writeToFile:entitlementsPath options:0 error:&error]) {
-				NSLog(@"Failed to write entitlements to %@: %@", entitlementsPath, error);
-				return 175;
-			}
-			signArg = [@"-S" stringByAppendingString:entitlementsPath];
 		}
 		int ldidRet = runLdid(@[signArg, filePath], nil, &errorOutput);
 		if (entitlementsPath) {
