@@ -78,15 +78,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/theos
-          key: ${{ runner.os }}-theos-${{ hashFiles('.github/workflows/build-release.yml') }}-master
+          key: ${{ runner.os }}-roothide-theos-${{ hashFiles('.github/workflows/build-release.yml') }}-master
           restore-keys: |
-            ${{ runner.os }}-theos-
+            ${{ runner.os }}-roothide-theos-
 
       - name: Checkout THEOS framework
         if: steps.cache-theos.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
-          repository: theos/theos
+          repository: roothide/theos
           ref: master
           path: theos
           submodules: recursive
@@ -109,6 +109,7 @@ jobs:
           ls -la $(brew --prefix)/opt/libarchive/include/ || echo "libarchive include not found"
           
           make ci-build
+          make luisestore_lite_roothide
 
       - name: Create artifacts staging directory
         run: |
@@ -128,7 +129,11 @@ jobs:
         run: |
           # Find and collect all deb packages from .theos/packages and packages directories
           echo "Collecting deb packages..."
-          find . -type f -name "*.deb" \( -path "*/.theos/packages/*" -o -path "*/packages/*" \) -exec cp -v {} artifacts/ \;
+          find . -type f -name "*.deb" \( -path "*/.theos/packages/*" -o -path "*/packages/*" \) ! -path "./LuiseStoreLiteRoothide/*" -exec cp -v {} artifacts/ \;
+
+          # RootHide shares the regular Lite package ID/version, so give it a stable unique artifact name
+          find ./LuiseStoreLiteRoothide -type f -name "*.deb" \( -path "*/.theos/packages/*" -o -path "*/packages/*" \) -exec cp -v {} artifacts/LuiseStoreLiteRoothide.deb \;
+          test -f artifacts/LuiseStoreLiteRoothide.deb
           
           # List what we found
           echo "Deb packages found:"
@@ -222,6 +227,7 @@ jobs:
             This release includes the following build artifacts:
             - LuiseStore.tar - Main LuiseStore package
             - LuiseHelper and LuiseStoreLite deb packages
+            - LuiseStoreLiteRoothide.deb - RootHide package
             
             Note: Installer IPAs are not included in automated builds as they require a victim IPA.
             

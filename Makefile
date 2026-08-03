@@ -2,6 +2,8 @@ TOPTARGETS := all clean update
 
 $(TOPTARGETS): pre_build make_fastPathSign make_roothelper make_luisestore make_trollhelper_embedded make_trollhelper_package assemble_luisestore build_installer15 build_installer64e make_luisestore_lite
 
+luisestore_lite_roothide: make_luisestore_lite_roothide
+
 # CI build target without installers (requires InstallerVictim.ipa)
 ci-build: pre_build ci_make_fastPathSign ci_make_roothelper ci_make_luisestore ci_make_trollhelper_embedded ci_make_trollhelper_package ci_assemble_luisestore ci_make_luisestore_lite
 
@@ -138,4 +140,12 @@ make_luisestore_lite:
 	@$(MAKE) -C ./LuiseStoreLite $(MAKECMDGOALS)
 endif
 
-.PHONY: $(TOPTARGETS) ci-build pre_build assemble_luisestore make_trollhelper_package make_trollhelper_embedded build_installer15 build_installer64e
+make_luisestore_lite_roothide:
+	@$(MAKE) -C ./RootHelper LUISESTORE_LITE=1 THEOS_PACKAGE_SCHEME=roothide clean
+	@$(MAKE) -C ./LuiseStoreLiteRoothide THEOS_PACKAGE_SCHEME=roothide clean
+	@$(MAKE) -C ./RootHelper DEBUG=0 LUISESTORE_LITE=1 THEOS_PACKAGE_SCHEME=roothide
+	@rm -f ./LuiseStoreLiteRoothide/Resources/luisestorehelper
+	@cp ./RootHelper/.theos/obj/luisestorehelper_lite ./LuiseStoreLiteRoothide/Resources/luisestorehelper
+	@$(MAKE) -C ./LuiseStoreLiteRoothide package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+
+.PHONY: $(TOPTARGETS) ci-build luisestore_lite_roothide pre_build assemble_luisestore make_trollhelper_package make_trollhelper_embedded build_installer15 build_installer64e make_luisestore_lite_roothide

@@ -1,0 +1,9 @@
+Package: com.luisepog.luisestorelite
+Name: LuiseStore Lite (RootHide)
+Version: 2.1
+Architecture: iphoneos-arm
+Description: LuiseStore for RootHide jailbroken iOS
+Depends: ldid
+Maintainer: luisepog
+Author: luisepog
+Section: Applications
