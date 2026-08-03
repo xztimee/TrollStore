@@ -24,7 +24,6 @@
 #import <SpringBoardServices/SpringBoardServices.h>
 #import <FrontBoardServices/FBSSystemService.h>
 #import <Security/Security.h>
-#import <roothide.h>
 
 #ifdef EMBEDDED_ROOT_HELPER
 #define MAIN_NAME rootHelperMain
@@ -254,7 +253,7 @@ BOOL isLdidInstalled(void)
 
 NSString *getLdidPath(void)
 {
-	return jbroot(@"/usr/bin/ldid");
+	return LSJBRootPath(@"/usr/bin/ldid");
 }
 
 #else
@@ -297,6 +296,20 @@ int runLdid(NSArray* args, NSString** output, NSString** errorOutput)
 {
 	NSString* ldidPath = getLdidPath();
 	NSMutableArray* argsM = args.mutableCopy ?: [NSMutableArray new];
+#ifdef LUISESTORE_LITE
+	// ldid lives in jbroot and remaps absolute paths; convert rootfs inputs so it
+	// can still open temporary entitlements / binaries outside the jailbreak root.
+	for (NSUInteger i = 0; i < argsM.count; i++)
+	{
+		NSString* argument = argsM[i];
+		NSString* prefix = [argument hasPrefix:@"-S/"] ? @"-S" : @"";
+		NSString* path = prefix.length ? [argument substringFromIndex:prefix.length] : argument;
+		if ([path hasPrefix:@"/"])
+		{
+			argsM[i] = [prefix stringByAppendingString:LSRootfsPath(path)];
+		}
+	}
+#endif
 	[argsM insertObject:ldidPath.lastPathComponent atIndex:0];
 
 	NSUInteger argCount = [argsM count];
@@ -323,7 +336,7 @@ int runLdid(NSArray* args, NSString** output, NSString** errorOutput)
 	
 	pid_t task_pid;
 	int status = -200;
-	NSLog(@"About to spawn ldid (%@) with args %@", ldidPath, args);
+	NSLog(@"About to spawn ldid (%@) with args %@", ldidPath, [argsM subarrayWithRange:NSMakeRange(1, argsM.count - 1)]);
 	int spawnError = posix_spawn(&task_pid, [ldidPath fileSystemRepresentation], &action, NULL, (char* const*)argsC, NULL);
 	for (NSUInteger i = 0; i < argCount; i++)
 	{
@@ -519,8 +532,8 @@ int signAdhoc(NSString *filePath, NSDictionary *entitlements)
 		{
 			NSData *entitlementsXML = [NSPropertyListSerialization dataWithPropertyList:entitlements format:NSPropertyListXMLFormat_v1_0 options:0 error:nil];
 			if (entitlementsXML) {
-				// Write next to the binary being signed: NSTemporaryDirectory() may
-				// resolve to /var/tmp which can be missing or unwritable on rootless
+				// Prefer beside the target binary: NSTemporaryDirectory() can resolve to a
+				// missing/unwritable /var/tmp on some rootless/RootHide installs.
 				NSString *targetDir = [filePath stringByDeletingLastPathComponent];
 				entitlementsPath = [[targetDir stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"plist"];
 				if (![entitlementsXML writeToFile:entitlementsPath atomically:YES]) {
@@ -531,12 +544,10 @@ int signAdhoc(NSString *filePath, NSDictionary *entitlements)
 						return 175;
 					}
 				}
-				// RootHide ldid remaps paths through jbroot; rootfs() makes rootfs paths
-				// visible again. On rootful/rootless builds this is an identity stub.
-				signArg = [@"-S" stringByAppendingString:rootfs(entitlementsPath)];
+				signArg = [@"-S" stringByAppendingString:entitlementsPath];
 			}
 		}
-		int ldidRet = runLdid(@[signArg, rootfs(filePath)], nil, &errorOutput);
+		int ldidRet = runLdid(@[signArg, filePath], nil, &errorOutput);
 		if (entitlementsPath) {
 			[[NSFileManager defaultManager] removeItemAtPath:entitlementsPath error:nil];
 		}

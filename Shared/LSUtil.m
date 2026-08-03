@@ -4,7 +4,6 @@
 #import <spawn.h>
 #import <sys/sysctl.h>
 #import <mach-o/dyld.h>
-#import <roothide.h>
 
 static EXPLOIT_TYPE gPlatformVulnerabilities;
 
@@ -40,7 +39,7 @@ NSString *getExecutablePath(void)
 
 BOOL shouldRegisterAsUserByDefault(void)
 {
-	if ([[NSFileManager defaultManager] fileExistsAtPath:jbroot(@"/Library/MobileSubstrate/DynamicLibraries/AppSyncUnified-FrontBoard.dylib")]) {
+	if ([[NSFileManager defaultManager] fileExistsAtPath:LSJBRootPath(@"/Library/MobileSubstrate/DynamicLibraries/AppSyncUnified-FrontBoard.dylib")]) {
 		return YES;
 	}
 	return NO;

@@ -1,6 +1,20 @@
 @import Foundation;
 #import "CoreServices.h"
 
+#ifdef THEOS_PACKAGE_SCHEME_ROOTHIDE
+#import <roothide.h>
+#define LSJBRootPath(path) jbroot(path)
+#define LSRootfsPath(path) rootfs(path)
+#else
+#import <libroot.h>
+#define LSJBRootPath(path) JBROOT_PATH(path)
+#define LSRootfsPath(path) ({ \
+	NSString *_lsPath = (path); \
+	NSString *_lsConverted = ROOTFS_PATH(_lsPath); \
+	_lsConverted ?: _lsPath; \
+})
+#endif
+
 #define LuiseStoreErrorDomain @"LuiseStoreErrorDomain"
 
 #define TS_MARKER @"_LuiseStore"
