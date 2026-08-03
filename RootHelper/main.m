@@ -299,6 +299,7 @@ int runLdid(NSArray* args, NSString** output, NSString** errorOutput)
 #ifdef LUISESTORE_LITE
 	// ldid lives in jbroot and remaps absolute paths; convert rootfs inputs so it
 	// can still open temporary entitlements / binaries outside the jailbreak root.
+	BOOL ldidRunsInRootHide = [ldidPath containsString:@"/.jbroot-"];
 	for (NSUInteger i = 0; i < argsM.count; i++)
 	{
 		NSString* argument = argsM[i];
@@ -306,7 +307,12 @@ int runLdid(NSArray* args, NSString** output, NSString** errorOutput)
 		NSString* path = prefix.length ? [argument substringFromIndex:prefix.length] : argument;
 		if ([path hasPrefix:@"/"])
 		{
-			argsM[i] = [prefix stringByAppendingString:LSRootfsPath(path)];
+			NSString* convertedPath = LSRootfsPath(path);
+			if (ldidRunsInRootHide && [convertedPath isEqualToString:path])
+			{
+				convertedPath = [@"/rootfs" stringByAppendingString:path];
+			}
+			argsM[i] = [prefix stringByAppendingString:convertedPath];
 		}
 	}
 #endif
