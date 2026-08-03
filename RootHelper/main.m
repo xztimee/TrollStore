@@ -24,11 +24,7 @@
 #import <SpringBoardServices/SpringBoardServices.h>
 #import <FrontBoardServices/FBSSystemService.h>
 #import <Security/Security.h>
-#ifdef LUISESTORE_ROOTHIDE
 #import <roothide.h>
-#else
-#import <libroot.h>
-#endif
 
 #ifdef EMBEDDED_ROOT_HELPER
 #define MAIN_NAME rootHelperMain
@@ -258,11 +254,7 @@ BOOL isLdidInstalled(void)
 
 NSString *getLdidPath(void)
 {
-#ifdef LUISESTORE_ROOTHIDE
 	return jbroot(@"/usr/bin/ldid");
-#else
-	return JBROOT_PATH(@"/usr/bin/ldid");
-#endif
 }
 
 #else
@@ -539,18 +531,12 @@ int signAdhoc(NSString *filePath, NSDictionary *entitlements)
 						return 175;
 					}
 				}
-#ifdef LUISESTORE_ROOTHIDE
+				// RootHide ldid remaps paths through jbroot; rootfs() makes rootfs paths
+				// visible again. On rootful/rootless builds this is an identity stub.
 				signArg = [@"-S" stringByAppendingString:rootfs(entitlementsPath)];
-#else
-				signArg = [@"-S" stringByAppendingString:entitlementsPath];
-#endif
 			}
 		}
-#ifdef LUISESTORE_ROOTHIDE
 		int ldidRet = runLdid(@[signArg, rootfs(filePath)], nil, &errorOutput);
-#else
-		int ldidRet = runLdid(@[signArg, filePath], nil, &errorOutput);
-#endif
 		if (entitlementsPath) {
 			[[NSFileManager defaultManager] removeItemAtPath:entitlementsPath error:nil];
 		}

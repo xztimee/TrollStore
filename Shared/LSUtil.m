@@ -4,11 +4,7 @@
 #import <spawn.h>
 #import <sys/sysctl.h>
 #import <mach-o/dyld.h>
-#ifdef LUISESTORE_ROOTHIDE
 #import <roothide.h>
-#else
-#import <libroot.h>
-#endif
 
 static EXPLOIT_TYPE gPlatformVulnerabilities;
 
@@ -44,11 +40,7 @@ NSString *getExecutablePath(void)
 
 BOOL shouldRegisterAsUserByDefault(void)
 {
-#ifdef LUISESTORE_ROOTHIDE
 	if ([[NSFileManager defaultManager] fileExistsAtPath:jbroot(@"/Library/MobileSubstrate/DynamicLibraries/AppSyncUnified-FrontBoard.dylib")]) {
-#else
-	if ([[NSFileManager defaultManager] fileExistsAtPath:JBROOT_PATH(@"/Library/MobileSubstrate/DynamicLibraries/AppSyncUnified-FrontBoard.dylib")]) {
-#endif
 		return YES;
 	}
 	return NO;

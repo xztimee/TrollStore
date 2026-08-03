@@ -32,7 +32,6 @@ $(HELPER_NAME)_INSTALL_PATH = /usr/local/bin
 $(HELPER_NAME)_LIBRARIES = archive
 ifeq ($(THEOS_PACKAGE_SCHEME),roothide)
 $(HELPER_NAME)_LIBRARIES += roothide
-$(HELPER_NAME)_CFLAGS += -DLUISESTORE_ROOTHIDE
 endif
 $(HELPER_NAME)_FRAMEWORKS = CoreTelephony CoreServices
 $(HELPER_NAME)_PRIVATE_FRAMEWORKS = SpringBoardServices BackBoardServices MobileContainerManager FrontBoardServices RunningBoardServices

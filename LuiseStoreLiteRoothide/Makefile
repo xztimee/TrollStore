@@ -16,7 +16,7 @@ LuiseStoreLite_RESOURCE_FILES = Resources/luisestorehelper ../varClean/varClean/
 LuiseStoreLite_FRAMEWORKS = UIKit CoreGraphics CoreServices CoreTelephony
 LuiseStoreLite_PRIVATE_FRAMEWORKS = Preferences MobileIcons MobileContainerManager
 LuiseStoreLite_LIBRARIES = archive roothide
-LuiseStoreLite_CFLAGS = -fobjc-arc -I../Shared -I$(shell brew --prefix)/opt/libarchive/include -DLUISESTORE_LITE -DLUISESTORE_ROOTHIDE
+LuiseStoreLite_CFLAGS = -fobjc-arc -I../Shared -I$(shell brew --prefix)/opt/libarchive/include -DLUISESTORE_LITE
 LuiseStoreLite_CODESIGN_FLAGS = -Sentitlements.plist
 
 include $(THEOS_MAKE_PATH)/application.mk
