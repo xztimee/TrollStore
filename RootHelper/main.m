@@ -723,7 +723,7 @@ int signApp(NSString* appPath)
 #else
 			// Since LuiseStore Lite adhoc signs stuff, this means that on PMAP_CS devices, it will run with "PMAP_CS_IN_LOADED_TRUST_CACHE" trust level
 			// We need to overwrite it so that the app runs as expected (Dopamine 2.1.5+ feature)
-			entitlementsToUse[@"jb.pmap_cs_custom_trust"] = @"PMAP_CS_APP_STORE";
+			entitlementsToUse[@"jb.pmap_cs.custom_trust"] = @"PMAP_CS_APP_STORE";
 #endif
 
 			int r = signAdhoc(bundleMainExecutablePath, entitlementsToUse);
